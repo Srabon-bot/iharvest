@@ -1,21 +1,46 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import Card from '../../components/ui/Card';
 import Table from '../../components/ui/Table';
+import StatusBadge from '../../components/ui/StatusBadge';
+import { getAllUsers } from '../../services/userService';
+import { getAllLivestock } from '../../services/livestockService';
+import { getAllInvestments } from '../../services/investmentService';
 import { Users, DollarSign, Activity, Tractor } from 'lucide-react';
 
+const SEED_USERS = [
+  { id: 1, name: 'Alice Ahmed', email: 'alice@iharvest.com', role: 'investor', isActive: true },
+  { id: 2, name: 'Ben Farmer', email: 'ben@iharvest.com', role: 'farmer', isActive: true },
+  { id: 3, name: 'Dr. Clara Vet', email: 'clara@iharvest.com', role: 'vet', isActive: true },
+];
+
 const AdminDashboard = () => {
-  const recentUsers = [
-    { id: 1, name: 'John Doe', email: 'john@example.com', role: 'investor', status: 'active' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'farmer', status: 'active' },
-    { id: 3, name: 'Mike Johnson', email: 'mike@example.com', role: 'vet', status: 'active' },
-  ];
+  const [stats, setStats] = useState({ users: 1245, livestock: 84, investments: 2400000 });
+  const [recentUsers, setRecentUsers] = useState(SEED_USERS);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const [users, livestock, investments] = await Promise.all([
+          getAllUsers(), getAllLivestock(), getAllInvestments()
+        ]);
+        if (users.length) {
+          setStats({
+            users: users.length,
+            livestock: livestock.length,
+            investments: investments.reduce((s, i) => s + (Number(i.amount) || 0), 0),
+          });
+          setRecentUsers(users.slice(0, 5));
+        }
+      } catch { /* use seed */ }
+    })();
+  }, []);
 
   const columns = [
     { header: 'Name', accessor: 'name' },
     { header: 'Email', accessor: 'email' },
-    { header: 'Role', accessor: 'role' },
-    { header: 'Status', accessor: 'status' },
+    { header: 'Role', accessor: 'role', render: (v) => <StatusBadge status={v} /> },
+    { header: 'Status', accessor: 'isActive', render: (v) => <StatusBadge status={v ? 'active' : 'suspended'} /> },
   ];
 
   return (
@@ -27,25 +52,16 @@ const AdminDashboard = () => {
         <p style={{ color: 'var(--text-secondary)' }}>System status and metrics at a glance.</p>
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-        gap: 'var(--spacing-lg)',
-        marginBottom: 'var(--spacing-xl)'
-      }}>
-        <Card variant="stat" title="Total Users" value="1,245" icon={Users} trend={{ value: 12, isPositive: true }} />
-        <Card variant="stat" title="Active Farms" value="84" icon={Tractor} trend={{ value: 5, isPositive: true }} />
-        <Card variant="stat" title="Total Investments" value="$2.4M" icon={DollarSign} trend={{ value: 18, isPositive: true }} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--spacing-lg)', marginBottom: 'var(--spacing-xl)' }}>
+        <Card variant="stat" title="Total Users" value={stats.users.toLocaleString()} icon={Users} trend={{ value: 12, isPositive: true }} />
+        <Card variant="stat" title="Active Livestock Batches" value={stats.livestock.toLocaleString()} icon={Tractor} trend={{ value: 5, isPositive: true }} />
+        <Card variant="stat" title="Total Investments" value={`$${(stats.investments / 1e6).toFixed(1)}M`} icon={DollarSign} trend={{ value: 18, isPositive: true }} />
         <Card variant="stat" title="System Health" value="99.9%" icon={Activity} />
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr',
-        gap: 'var(--spacing-lg)'
-      }}>
-        <Card title="Recent Signups" style={{ padding: 'var(--spacing-lg)' }}>
-          <Table columns={columns} data={recentUsers} />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 'var(--spacing-lg)' }}>
+        <Card title="Recent Signups">
+          <Table columns={columns} data={recentUsers} searchable pageSize={5} />
         </Card>
       </div>
     </DashboardLayout>
