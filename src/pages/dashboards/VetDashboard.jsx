@@ -1,22 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import Card from '../../components/ui/Card';
 import Table from '../../components/ui/Table';
+import StatusBadge from '../../components/ui/StatusBadge';
 import { Syringe, Cross, Calendar, ClipboardList } from 'lucide-react';
+import { getVetRequests } from '../../services/vetService';
+import { useAuth } from '../../hooks/useAuth';
 
 const VetDashboard = () => {
-  const healthRequests = [
-    { id: 'REQ-01', farmer: 'Jane Smith', batch: 'BCH-102', issue: 'Reduced feeding', status: 'Pending', date: '2026-04-24' },
-    { id: 'REQ-02', farmer: 'Tom Brown', batch: 'COW-05', issue: 'Limping', status: 'In Progress', date: '2026-04-23' },
-  ];
+  const { user } = useAuth();
+  const [requests, setRequests] = useState([]);
+
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const data = await getVetRequests(user?.uid);
+        if (data && data.length > 0) setRequests(data);
+      } catch (error) {
+        console.error('Failed to fetch vet requests:', error);
+      }
+    };
+    if (user?.uid) fetchRequests();
+  }, [user]);
+
+  const pendingCount = requests.filter(r => r.status === 'pending').length;
+  const completedCount = requests.filter(r => r.status === 'completed').length;
 
   const columns = [
     { header: 'Request ID', accessor: 'id' },
-    { header: 'Farmer', accessor: 'farmer' },
-    { header: 'Batch/Animal', accessor: 'batch' },
+    { header: 'Farmer', accessor: 'farmerId' },
+    { header: 'Livestock ID', accessor: 'livestockId' },
     { header: 'Issue', accessor: 'issue' },
-    { header: 'Status', accessor: 'status' },
-    { header: 'Date', accessor: 'date' },
+    { header: 'Status', accessor: 'status', render: (v) => <StatusBadge status={v} /> },
+    { header: 'Date', accessor: 'createdAt', render: (v) => v ? new Date(v).toLocaleDateString() : '—' },
   ];
 
   return (
@@ -28,25 +44,16 @@ const VetDashboard = () => {
         <p style={{ color: 'var(--text-secondary)' }}>Manage health requests, vaccinations, and field visits.</p>
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-        gap: 'var(--spacing-lg)',
-        marginBottom: 'var(--spacing-xl)'
-      }}>
-        <Card variant="stat" title="Pending Requests" value="12" icon={ClipboardList} trend={{ value: 2, isPositive: false }} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--spacing-lg)', marginBottom: 'var(--spacing-xl)' }}>
+        <Card variant="stat" title="Pending Requests" value={String(pendingCount)} icon={ClipboardList} trend={{ value: pendingCount, isPositive: false }} />
         <Card variant="stat" title="Scheduled Visits" value="5" icon={Calendar} />
         <Card variant="stat" title="Vaccinations Due" value="8" icon={Syringe} trend={{ value: -3, isPositive: true }} />
-        <Card variant="stat" title="Cases Resolved" value="142" icon={Cross} trend={{ value: 15, isPositive: true }} />
+        <Card variant="stat" title="Cases Resolved" value={String(completedCount)} icon={Cross} trend={{ value: completedCount, isPositive: true }} />
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr',
-        gap: 'var(--spacing-lg)'
-      }}>
-        <Card title="Recent Health Requests" style={{ padding: 'var(--spacing-lg)' }}>
-          <Table columns={columns} data={healthRequests} />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 'var(--spacing-lg)' }}>
+        <Card title="Recent Health Requests">
+          <Table columns={columns} data={requests} searchable pageSize={8} />
         </Card>
       </div>
     </DashboardLayout>

@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Menu, Bell, Search, User, LogOut } from 'lucide-react';
 import { logoutUser } from '../../services/authService';
+import { useAuth } from '../../hooks/useAuth';
 import './Navbar.css';
 
-const Navbar = ({ toggleSidebar, user }) => {
+const Navbar = ({ toggleSidebar }) => {
+  const { user, userProfile } = useAuth();
+  const displayName = userProfile?.name || user?.displayName || user?.email || 'Guest User';
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
@@ -43,7 +46,7 @@ const Navbar = ({ toggleSidebar, user }) => {
             )}
           </div>
           <div className="user-info">
-            <span className="user-name">{user?.displayName || user?.name || user?.email || 'Guest User'}</span>
+            <span className="user-name">{displayName}</span>
           </div>
         </div>
 

@@ -18,6 +18,31 @@ import FsoDashboard from './pages/dashboards/FsoDashboard.jsx';
 import ManagerDashboard from './pages/dashboards/ManagerDashboard.jsx';
 import FundManagerDashboard from './pages/dashboards/FundManagerDashboard.jsx';
 
+// Admin sub-pages
+import UsersPage from './pages/admin/UsersPage.jsx';
+import FarmsPage from './pages/admin/FarmsPage.jsx';
+import AdminInvestmentsPage from './pages/admin/InvestmentsPage.jsx';
+
+// Farmer sub-pages
+import LivestockPage from './pages/farmer/LivestockPage.jsx';
+import TasksPage from './pages/farmer/TasksPage.jsx';
+
+// Investor sub-pages
+import MarketplacePage from './pages/investor/MarketplacePage.jsx';
+import InvestorTransactionsPage from './pages/investor/TransactionsPage.jsx';
+
+// FSO sub-pages
+import SurveysPage from './pages/fso/SurveysPage.jsx';
+import FarmersPage from './pages/fso/FarmersPage.jsx';
+
+// Manager sub-pages
+import ClustersPage from './pages/manager/ClustersPage.jsx';
+import DeliveriesPage from './pages/manager/DeliveriesPage.jsx';
+
+// Vet sub-pages
+import RequestsPage from './pages/vet/RequestsPage.jsx';
+import ReportsPage from './pages/vet/ReportsPage.jsx';
+
 // Security
 import RoleRoute from './routes/RoleRoute.jsx';
 
@@ -32,7 +57,6 @@ function App() {
     );
   }
 
-  // Determine root redirect based on role
   const getRootRedirect = () => {
     if (!user) return '/login';
     return ROLE_DASHBOARD[role] || '/unauthorized';
@@ -45,35 +69,54 @@ function App() {
         <Route path="/login" element={user ? <Navigate to={getRootRedirect()} replace /> : <Login />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="/design" element={<DesignSystemDemo />} />
-        
+
         {/* Root Redirect */}
         <Route path="/" element={<Navigate to={getRootRedirect()} replace />} />
 
-        {/* Protected Role Routes */}
+        {/* ══ Admin ══ */}
         <Route element={<RoleRoute roles={[ROLES.ADMIN]} />}>
           <Route path={ROLE_DASHBOARD[ROLES.ADMIN]} element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<UsersPage />} />
+          <Route path="/admin/farms" element={<FarmsPage />} />
+          <Route path="/admin/investments" element={<AdminInvestmentsPage />} />
         </Route>
 
+        {/* ══ Farmer ══ */}
         <Route element={<RoleRoute roles={[ROLES.FARMER]} />}>
           <Route path={ROLE_DASHBOARD[ROLES.FARMER]} element={<FarmerDashboard />} />
+          <Route path="/farmer/livestock" element={<LivestockPage />} />
+          <Route path="/farmer/tasks" element={<TasksPage />} />
         </Route>
 
+        {/* ══ Investor ══ */}
         <Route element={<RoleRoute roles={[ROLES.INVESTOR]} />}>
           <Route path={ROLE_DASHBOARD[ROLES.INVESTOR]} element={<InvestorDashboard />} />
+          <Route path="/investor/investments" element={<MarketplacePage />} />
+          <Route path="/investor/transactions" element={<InvestorTransactionsPage />} />
         </Route>
 
+        {/* ══ Vet ══ */}
         <Route element={<RoleRoute roles={[ROLES.VET]} />}>
           <Route path={ROLE_DASHBOARD[ROLES.VET]} element={<VetDashboard />} />
+          <Route path="/vet/requests" element={<RequestsPage />} />
+          <Route path="/vet/reports" element={<ReportsPage />} />
         </Route>
 
+        {/* ══ FSO ══ */}
         <Route element={<RoleRoute roles={[ROLES.FSO]} />}>
           <Route path={ROLE_DASHBOARD[ROLES.FSO]} element={<FsoDashboard />} />
+          <Route path="/fso/surveys" element={<SurveysPage />} />
+          <Route path="/fso/farmers" element={<FarmersPage />} />
         </Route>
 
+        {/* ══ Cluster Manager ══ */}
         <Route element={<RoleRoute roles={[ROLES.CLUSTER_MANAGER]} />}>
           <Route path={ROLE_DASHBOARD[ROLES.CLUSTER_MANAGER]} element={<ManagerDashboard />} />
+          <Route path="/manager/clusters" element={<ClustersPage />} />
+          <Route path="/manager/deliveries" element={<DeliveriesPage />} />
         </Route>
 
+        {/* ══ Fund Manager ══ */}
         <Route element={<RoleRoute roles={[ROLES.FUND_MANAGER]} />}>
           <Route path={ROLE_DASHBOARD[ROLES.FUND_MANAGER]} element={<FundManagerDashboard />} />
         </Route>

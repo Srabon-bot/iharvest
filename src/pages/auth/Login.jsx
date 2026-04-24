@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
 import { loginUser } from '../../services/authService';
 import { ROLE_DASHBOARD } from '../../utils/constants';
 import Input from '../../components/ui/Input';
@@ -90,6 +89,9 @@ const Login = () => {
             <Button size="sm" variant="outline" onClick={() => setDemoCredentials('farmer@iharvest.com', 'farmer123')}>Farmer</Button>
             <Button size="sm" variant="outline" onClick={() => setDemoCredentials('investor@iharvest.com', 'investor123')}>Investor</Button>
             <Button size="sm" variant="outline" onClick={() => setDemoCredentials('vet@iharvest.com', 'vet123')}>Vet</Button>
+            <Button size="sm" variant="outline" onClick={() => setDemoCredentials('fso@iharvest.com', 'fso123')}>FSO</Button>
+            <Button size="sm" variant="outline" onClick={() => setDemoCredentials('manager@iharvest.com', 'manager123')}>Manager</Button>
+            <Button size="sm" variant="outline" onClick={() => setDemoCredentials('fund@iharvest.com', 'fund123')}>Fund Mgr</Button>
           </div>
         </div>
       </Card>

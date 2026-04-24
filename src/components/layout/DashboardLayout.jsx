@@ -6,8 +6,8 @@ import { useAuth } from '../../hooks/useAuth';
 
 const DashboardLayout = ({ children }) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const { user } = useAuth(); // Assuming useAuth provides current user and role
-  const role = user?.role || 'admin';
+  const { user, role } = useAuth();
+  const sidebarRole = role || 'admin';
 
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
@@ -15,10 +15,10 @@ const DashboardLayout = ({ children }) => {
 
   return (
     <div className="dashboard-layout">
-      <Sidebar isCollapsed={isSidebarCollapsed} toggleSidebar={toggleSidebar} role={role} />
-      
+      <Sidebar isCollapsed={isSidebarCollapsed} toggleSidebar={toggleSidebar} role={sidebarRole} />
+
       <div className="dashboard-main">
-        <Navbar toggleSidebar={toggleSidebar} user={user} />
+        <Navbar toggleSidebar={toggleSidebar} />
         <main className="dashboard-content">
           {children}
         </main>

@@ -58,13 +58,14 @@ export const StatCard = ({ title, value, icon: Icon, trend, className = '', styl
   
   if (trend) {
     if (typeof trend === 'object') {
-      trendIcon = trend.isPositive ? '↑' : trend.value < 0 || trend.isPositive === false ? '↓' : '→';
-      trendClass = trend.isPositive ? 'trend-up' : trend.value < 0 || trend.isPositive === false ? 'trend-down' : 'trend-flat';
-      trendText = `${Math.abs(trend.value)}%`;
+      trendIcon = trend.isPositive ? '↑' : trend.isPositive === false ? '↓' : '→';
+      trendClass = trend.isPositive ? 'trend-up' : trend.isPositive === false ? 'trend-down' : 'trend-flat';
+      // Only show label if explicitly provided — never auto-format raw numbers as %
+      trendText = trend.label || '';
     } else {
       trendIcon = trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→';
       trendClass = `trend-${trend}`;
-      trendText = ''; // The old component expected trendValue which we aren't passing anymore
+      trendText = '';
     }
   }
 

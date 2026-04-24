@@ -38,8 +38,6 @@ const ROLE_NAV_ITEMS = {
   ],
   [ROLES.FUND_MANAGER]: [
     { name: 'Dashboard', path: ROLE_DASHBOARD[ROLES.FUND_MANAGER], icon: LayoutDashboard },
-    { name: 'Transactions', path: '/fund-manager/transactions', icon: FileText },
-    { name: 'Pools', path: '/fund-manager/pools', icon: PieChart },
   ],
 };
 

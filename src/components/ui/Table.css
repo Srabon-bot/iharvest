@@ -18,7 +18,8 @@
   text-align: left;
 }
 
-.table th, .table td {
+.table th,
+.table td {
   padding: var(--spacing-3) var(--spacing-4);
   border-bottom: 1px solid var(--border);
 }
@@ -93,4 +94,54 @@
 .pagination-controls {
   display: flex;
   gap: var(--spacing-2);
+  align-items: center;
+}
+
+.pagination-page {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  padding: 0 var(--spacing-2);
+}
+
+/* ── Search bar ─────────────────────────────── */
+.table-search-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.table-search-icon {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.table-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+.table-search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.table-search-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.table-search-clear:hover {
+  color: var(--text-primary);
 }
