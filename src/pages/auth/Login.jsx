@@ -216,12 +216,12 @@ const Login = () => {
           <div className="demo-credentials" style={{ marginTop: '20px' }}>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>Demo Credentials:</p>
             <div className="demo-buttons" style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-              <Button size="sm" variant="outline" onClick={() => setDemoCredentials('admin@iharvest.com', 'admin123')}>Admin</Button>
-              <Button size="sm" variant="outline" onClick={() => setDemoCredentials('farmer@iharvest.com', 'farmer123')}>Farmer</Button>
-              <Button size="sm" variant="outline" onClick={() => setDemoCredentials('investor@iharvest.com', 'investor123')}>Investor</Button>
-              <Button size="sm" variant="outline" onClick={() => setDemoCredentials('vet@iharvest.com', 'vet123')}>Vet</Button>
-              <Button size="sm" variant="outline" onClick={() => setDemoCredentials('fso@iharvest.com', 'fso123')}>FSO</Button>
-              <Button size="sm" variant="outline" onClick={() => setDemoCredentials('manager@iharvest.com', 'manager123')}>Manager</Button>
+              <Button size="sm" variant="outline" onClick={() => setDemoCredentials('admin@iharvest.com', '123456')}>Admin</Button>
+              <Button size="sm" variant="outline" onClick={() => setDemoCredentials('farmer@iharvest.com', '123456')}>Farmer</Button>
+              <Button size="sm" variant="outline" onClick={() => setDemoCredentials('investor@iharvest.com', '123456')}>Investor</Button>
+              <Button size="sm" variant="outline" onClick={() => setDemoCredentials('vet@iharvest.com', '123456')}>Vet</Button>
+              <Button size="sm" variant="outline" onClick={() => setDemoCredentials('fso@iharvest.com', '123456')}>FSO</Button>
+              <Button size="sm" variant="outline" onClick={() => setDemoCredentials('manager@iharvest.com', '123456')}>Manager</Button>
             </div>
           </div>
         )}

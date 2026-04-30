@@ -48,7 +48,18 @@ export function RoleRoute({ roles = [] }) {
     return <Navigate to={ROUTES.LOGIN} replace />;
   }
 
-  if (!role || !roles.includes(role)) {
+  // If we have a user but no profile/role yet, they might be in the middle of signup
+  // or the profile fetch is slightly delayed. Show loading instead of rejecting.
+  if (!role) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div className="spinner"></div>
+        <span style={{ marginLeft: '1rem', color: 'var(--text-secondary)' }}>Finalizing session...</span>
+      </div>
+    );
+  }
+
+  if (!roles.includes(role)) {
     return <Navigate to="/unauthorized" replace />;
   }
 

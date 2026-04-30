@@ -57,6 +57,7 @@ export function AuthProvider({ children }) {
         setUser(null);
         setUserProfile(null);
       } finally {
+        // Only stop loading once we've attempted to fetch the profile for an authenticated user
         setLoading(false);
       }
     });

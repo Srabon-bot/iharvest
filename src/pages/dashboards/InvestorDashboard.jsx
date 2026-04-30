@@ -53,9 +53,12 @@ const InvestorDashboard = () => {
     .filter(i => i.status === 'completed' && i.financials)
     .reduce((s, i) => s + Number(i.financials.investorPayout || 0), 0);
 
-  const walletBalance = transactions
-    .filter(t => t.status === 'completed')
-    .reduce((sum, t) => t.type === 'payout' ? sum + t.amount : sum - t.amount, 0);
+  const walletBalance = (transactions || [])
+    .filter(t => t && t.status === 'completed')
+    .reduce((sum, t) => {
+      const amt = Number(t.amount || 0);
+      return t.type === 'payout' ? sum + amt : sum - amt;
+    }, 0);
 
   const columns = [
     { header: 'Investment ID', accessor: 'id' },
