@@ -46,6 +46,7 @@ export function AuthProvider({ children }) {
         if (firebaseUser) {
           setUser(firebaseUser);
           const profile = await getUserProfile(firebaseUser.uid);
+          console.log('[AuthProvider] User authenticated:', firebaseUser.uid, 'Profile:', profile);
           setUserProfile(profile);
         } else {
           setUser(null);

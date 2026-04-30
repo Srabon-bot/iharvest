@@ -1,4 +1,5 @@
 # iHarvest: Developer Handover & Study Report
+### Live Site: [https://iharvest-1bd13.web.app](https://iharvest-1bd13.web.app)
 ### Deploy-Ready Milestone
 
 This report is designed for you and your teammate to fully understand, present, and deploy what you have built. It covers the complete architecture of the current system, answers the technical questions you are most likely to face, and provides a step-by-step tutorial for going live on Firebase Hosting.
@@ -73,16 +74,19 @@ RBAC in the frontend is a UX convenience. The real security lives in `firestore.
 Every service file (e.g., `vetService.js`, `transactionService.js`) wraps Firestore calls in try/catch. Every dashboard that calls a service also keeps a `SEED_*` constant array of sample data as its initial state. If Firebase is offline or returns empty, the dashboard still shows meaningful data. This is why the UI never shows a blank page during development.
 
 **7. Vite Code Splitting for Fast Load Times**
-The production build splits JavaScript into four separate files (chunks):
-- `vendor-react.js` — React, React DOM, React Router (~224KB)
-- `vendor-firebase.js` — Firebase SDK (~360KB)
-- `vendor-icons.js` — Lucide React icons (~19KB)
-- `index.js` — All of your own app code (~83KB)
+The production build splits JavaScript into separate files (chunks):
+- `vendor-react.js` — React, React Router
+- `vendor-firebase.js` — Firebase SDK
+- `vendor-icons.js` — Lucide React icons
+- `index.js` — Core application logic
 
-This means a user only needs to download `index.js` on repeat visits because their browser has cached the vendor chunks.
+**8. Industry-Standard Mudarabah Finance Model**
+The platform uses a dynamic Profit-Sharing (Mudarabah) model instead of fixed interest. The `investmentService.js` processes a `completeInvestmentCycle` which calculates the Net Profit (Gross Revenue - Capital - Expenses) and automatically distributes exact payouts to the Investor's and Farmer's wallets based on a predefined split (e.g., 40% Investor / 60% Farmer).
 
-**8. Utility Modules (Validators & Formatters)**
-`src/utils/validators.js` provides typed validation functions (`validatePassword`, `validatePackage`, `validateVetRequest`) that return `{ valid, errors[] }` objects — reusable from both services and UI form components. `src/utils/formatters.js` provides display helpers (`formatBDT`, `formatDate`, `formatRole`) that standardize how currency (৳ Taka), timestamps (Firestore `Timestamp` or JS `Date`), and role slugs are shown across all dashboards.
+**9. B2B Onboarding & Staff Provisioning Pipeline**
+- **Public Registration:** Defaults to the Investor role.
+- **Farmer Applications:** Farmers apply via the login page. FSOs conduct physical surveys and submit reports. Admins then review and "Approve" applications, automatically provisioning the Farmer's auth account.
+- **Internal Staff:** Admins can instantly create Vet, FSO, and Manager accounts using a dedicated portal that utilizes a secondary Firebase app instance (`firebaseAdminRegister`) to securely bypass session logouts.
 
 ---
 
@@ -101,7 +105,7 @@ This means a user only needs to download `index.js` on repeat visits because the
 > **A:** Security is enforced at two levels. First, in the frontend, our `<RoleRoute>` component reads the user's role from `AuthContext` and redirects unauthorized users before any page even renders. Second, and more importantly, our `firestore.rules` file enforces access at the database itself. For example, the rule `allow read: if resource.data.investorId == request.auth.uid` means a Firestore SDK call will be rejected with a permission error even if someone tried to access another investor's data directly. The frontend is UX; the rules are security.
 
 > **Q: How did you handle data before the Firebase backend was connected?**
-> **A:** Every dashboard component defines a `SEED_*` constant — an array of realistic sample objects — as the initial value of its `useState`. When the component mounts, it tries to fetch real data from Firebase. If that succeeds, the seed data is replaced. If it fails (Firebase is offline, not configured, or returns empty), the component silently falls back to the seed data. The user always sees a meaningful, functional dashboard.
+> **A:** During the development phase, every dashboard component defined a `SEED_*` constant — an array of realistic sample objects — as the initial value of its `useState`. If Firebase was offline, the component silently fell back to the seed data so the UI never broke. Now that the app is connected to the live Firestore database, we have removed all `SEED_` constants, ensuring the platform relies strictly on real-time production data.
 
 > **Q: How does your Table component work? How is it reusable?**
 > **A:** The `<Table>` component accepts two generic props: `columns` (an array of `{ header, accessor, render }` objects) and `data` (any array of objects). The `render` function in each column definition is optional — if provided, it receives the cell value and the whole row, so you can render a `<StatusBadge>`, a formatted currency string, or a button. The component internally manages its own search state (filtering across all visible columns) and pagination state. This design means the same component works for the investments table, the vet requests table, the user management table, and the transactions table.
@@ -109,8 +113,11 @@ This means a user only needs to download `index.js` on repeat visits because the
 > **Q: How does your build produce optimized output for production?**
 > **A:** We configured Vite's build system with manual chunk splitting using `rollupOptions.output.manualChunks`. This separates our 1,817 source modules into four logical chunks: React/Router, Firebase SDK, Lucide icons, and our own application code. Source maps are disabled in production for security. The result is that the Firebase vendor chunk is cached permanently by the browser and never re-downloaded unless Firebase releases a new version we upgrade to.
 
-> **Q: Why does the `/design` route only exist in development?**
-> **A:** In `App.jsx` we conditionally render that route: `{import.meta.env.DEV && <Route path="/design" ... />}`. `import.meta.env.DEV` is a Vite-injected constant that is `true` during `npm run dev` and `false` in the production build. Vite's tree-shaker completely removes that code branch from the production bundle — the route literally does not exist in the deployed app.
+> **Q: How do you handle financial returns on the platform?**
+> **A:** We use a dynamic Mudarabah (Profit-Sharing) model. Instead of promising fixed interest, investments define a percentage split (e.g., 40% to the investor, 60% to the farmer). When an agricultural cycle is completed, the system calculates the actual net profit (Revenue - Capital - Expenses) and automatically creates transaction records distributing the correct payouts to each user's digital wallet.
+
+> **Q: How are users onboarded securely?**
+> **A:** Public registration defaults strictly to the "Investor" role. Farmers cannot just sign up; they submit an "Application" which generates a lead. A Field Support Officer (FSO) then physically surveys the farm and submits a report. Finally, an Admin reviews the report and clicks "Approve", which automatically generates the Farmer's authentication account. For internal staff like Vets, the Admin uses a custom creation tool that utilizes a secondary Firebase app instance to securely generate accounts without logging out the Admin.
 
 ---
 
@@ -266,97 +273,5 @@ You will see a **Hosting URL** printed at the end:
 ```
 ✔ Hosting URL: https://your-project-id.web.app
 ```
-
----
-
-### Step 8: What to Edit in the Code After Deploying
-
-After your first successful deploy, here is exactly what needs to be updated in the codebase as real data starts coming in:
-
-#### 8.1 — Remove Seed Data from Dashboards
-Each dashboard has a `SEED_*` constant at the top for development. Once Firebase has real data, delete the constants and change the initial state to an empty array:
-
-```jsx
-// Before (development)
-const SEED_INVESTMENTS = [ { id: 'INV-001', ... } ];
-const [investments, setInvestments] = useState(SEED_INVESTMENTS);
-
-// After (production — real data fills this from Firebase)
-const [investments, setInvestments] = useState([]);
-```
-
-Files to update: `InvestorDashboard.jsx`, `VetDashboard.jsx`, `FarmerDashboard.jsx`, `TransactionsPage.jsx`, `FundManagerDashboard.jsx`, and any other dashboard containing a `SEED_*` constant.
-
----
-
-#### 8.2 — Replace Dollar Signs with Taka (BDT)
-The demo dashboards use `$` for currency. Switch to the formatter already built into the project:
-
-```jsx
-// In any dashboard file, add this import:
-import { formatBDT } from '../../utils/formatters';
-
-// Before:
-<Card value={`$${totalInvested.toLocaleString()}`} />
-
-// After:
-<Card value={formatBDT(totalInvested)} />
-```
-
----
-
-#### 8.3 — Replace Hardcoded Stat Card Values
-Some stat cards have hardcoded placeholder numbers. Replace them with real computed values:
-
-```jsx
-// FarmerDashboard.jsx — hardcoded placeholder
-<Card variant="stat" title="Completed Cycles" value="12" />
-
-// Replace with a real count from livestock data:
-const completedCycles = livestock.filter(l => l.status === 'sold').length;
-<Card variant="stat" title="Completed Cycles" value={String(completedCycles)} />
-```
-
----
-
-#### 8.4 — VetDashboard: Add Pending Unassigned Requests
-Currently `VetDashboard.jsx` only fetches requests already assigned to the logged-in vet. For a full inbox that also shows pending unassigned cases:
-
-```jsx
-// Current (only assigned requests):
-import { getVetRequests } from '../../services/vetService';
-const data = await getVetRequests(user?.uid || 'demo');
-
-// After deploy (assigned + pending queue):
-import { getVetRequests, getPendingRequests } from '../../services/vetService';
-const [assigned, pending] = await Promise.all([
-  getVetRequests(user.uid),
-  getPendingRequests(),
-]);
-setRequests([...assigned, ...pending]);
-```
-
----
-
-#### 8.5 — Compute Real Wallet Balance in InvestorDashboard
-The Wallet Balance card is currently hardcoded to `$1,250`. Compute it from real transactions:
-
-```jsx
-// InvestorDashboard.jsx — currently hardcoded
-<Card variant="stat" title="Wallet Balance" value="$1,250" />
-
-// Replace with live computation after fetching transactions:
-import { getTransactionsByUser } from '../../services/transactionService';
-import { formatBDT } from '../../utils/formatters';
-
-// In your useEffect, also fetch transactions, then:
-const walletBalance = transactions
-  .filter(t => t.status === 'completed')
-  .reduce((sum, t) => t.type === 'payout' ? sum + t.amount : sum - t.amount, 0);
-
-<Card variant="stat" title="Wallet Balance" value={formatBDT(walletBalance)} />
-```
-
----
 
 > **Tip:** After every batch of code changes, run `npm run deploy` again. The build takes ~500ms and the CDN update propagates instantly worldwide.

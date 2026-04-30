@@ -13,6 +13,7 @@ import {
   onAuthStateChanged,
   updateProfile,
 } from 'firebase/auth';
+import { initializeApp, deleteApp } from 'firebase/app';
 import { auth } from './config.js';
 
 /**
@@ -32,6 +33,29 @@ export async function firebaseRegister(email, password, displayName) {
   } catch (error) {
     console.error('[firebaseRegister]', error);
     throw error;
+  }
+}
+
+/**
+ * Admin creates a new user without logging out the current session.
+ * Initializes a temporary secondary Firebase app.
+ */
+export async function firebaseAdminRegister(email, password, displayName, config) {
+  const secondaryApp = initializeApp(config, 'SecondaryApp' + Date.now());
+  const secondaryAuth = getAuth(secondaryApp);
+  
+  try {
+    const credential = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+    if (displayName) {
+      await updateProfile(credential.user, { displayName });
+    }
+    await signOut(secondaryAuth);
+    return credential.user.uid;
+  } catch (error) {
+    console.error('[firebaseAdminRegister]', error);
+    throw error;
+  } finally {
+    await deleteApp(secondaryApp);
   }
 }
 

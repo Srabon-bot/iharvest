@@ -22,7 +22,6 @@ export const ROLES = Object.freeze({
   FSO: 'fso',
   CLUSTER_MANAGER: 'cluster_manager',
   VET: 'vet',
-  FUND_MANAGER: 'fund_manager',
   FARMER: 'farmer',
   INVESTOR: 'investor',
 });
@@ -85,7 +84,6 @@ export const ROUTES = Object.freeze({
   FSO_DASHBOARD: '/fso',
   MANAGER_DASHBOARD: '/manager',
   VET_DASHBOARD: '/vet',
-  FUND_MANAGER_DASHBOARD: '/fund-manager',
   FARMER_DASHBOARD: '/farmer',
   INVESTOR_DASHBOARD: '/investor',
 });
@@ -96,7 +94,6 @@ export const ROLE_DASHBOARD = Object.freeze({
   [ROLES.FSO]: ROUTES.FSO_DASHBOARD,
   [ROLES.CLUSTER_MANAGER]: ROUTES.MANAGER_DASHBOARD,
   [ROLES.VET]: ROUTES.VET_DASHBOARD,
-  [ROLES.FUND_MANAGER]: ROUTES.FUND_MANAGER_DASHBOARD,
   [ROLES.FARMER]: ROUTES.FARMER_DASHBOARD,
   [ROLES.INVESTOR]: ROUTES.INVESTOR_DASHBOARD,
 });

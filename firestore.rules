@@ -1,152 +1,18 @@
-rules_version = '2';
+rules_version='2'
+
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // ═══════════════════════════════════════════════════════════
-    // Helper functions
-    // ═══════════════════════════════════════════════════════════
-
-    // Check if user is authenticated
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-
-    // Get the user's role from their profile document
-    function getUserRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
-    }
-
-    // Check if user has a specific role
-    function hasRole(role) {
-      return isAuthenticated() && getUserRole() == role;
-    }
-
-    // Check if user has any of the given roles
-    function hasAnyRole(roles) {
-      return isAuthenticated() && getUserRole() in roles;
-    }
-
-    // Check if user is the document owner (by uid field)
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // users collection
-    // ═══════════════════════════════════════════════════════════
-    match /users/{userId} {
-      // Users can read their own profile; admin can read all
-      allow read: if isOwner(userId) || hasRole('admin');
-
-      // Only admin can create/update/delete user documents
-      // Exception: a user can create their own profile on registration
-      allow create: if isOwner(userId) || hasRole('admin');
-      allow update: if hasRole('admin');
-      allow delete: if hasRole('admin');
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // clusters collection
-    // ═══════════════════════════════════════════════════════════
-    match /clusters/{clusterId} {
-      allow read: if isAuthenticated() && hasAnyRole(['admin', 'cluster_manager', 'fso']);
-      allow write: if hasRole('admin');
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // packages collection
-    // ═══════════════════════════════════════════════════════════
-    match /packages/{packageId} {
-      // All authenticated users can read packages (marketplace)
-      allow read: if isAuthenticated();
-
-      // Only admin can create/update/delete packages
-      allow write: if hasRole('admin');
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // livestock collection
-    // ═══════════════════════════════════════════════════════════
-    match /livestock/{livestockId} {
-      // Admin can do everything
-      allow read, write: if hasRole('admin');
-
-      // FSO can read/write livestock assigned to them
-      allow read: if isAuthenticated() && resource.data.fsoId == request.auth.uid;
-      allow update: if hasRole('fso') && resource.data.fsoId == request.auth.uid;
-
-      // Farmer can read their own livestock
-      allow read: if isAuthenticated() && resource.data.farmerId == request.auth.uid;
-
-      // Investor can read their funded livestock
-      allow read: if isAuthenticated() && resource.data.investorId == request.auth.uid;
-
-      // Cluster manager can read livestock in their cluster
-      allow read: if hasRole('cluster_manager');
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // investments collection
-    // ═══════════════════════════════════════════════════════════
-    match /investments/{investmentId} {
-      // Investor can only read their own investments
-      allow read: if isAuthenticated() && resource.data.investorId == request.auth.uid;
-      allow create: if isAuthenticated() && request.resource.data.investorId == request.auth.uid;
-
-      // Admin and fund_manager can read/write all investments
-      allow read, write: if hasAnyRole(['admin', 'fund_manager']);
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // surveys collection
-    // ═══════════════════════════════════════════════════════════
-    match /surveys/{surveyId} {
-      // FSO can read/write surveys where fsoId matches their uid
-      allow read, write: if isAuthenticated() && resource.data.fsoId == request.auth.uid;
-      allow create: if isAuthenticated() && request.resource.data.fsoId == request.auth.uid;
-
-      // Admin and cluster_manager can read all surveys
-      allow read: if hasAnyRole(['admin', 'cluster_manager']);
-
-      // Farmer can read surveys about their livestock
-      allow read: if isAuthenticated() && resource.data.farmerId == request.auth.uid;
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // vet_requests collection
-    // ═══════════════════════════════════════════════════════════
-    match /vet_requests/{requestId} {
-      // Anyone authenticated can create a vet request
-      allow create: if isAuthenticated();
-
-      // Vet can read and update requests assigned to them
-      allow read: if isAuthenticated() && resource.data.vetId == request.auth.uid;
-      allow update: if hasRole('vet') && resource.data.vetId == request.auth.uid;
-
-      // FSO can read requests they submitted
-      allow read: if isAuthenticated() && resource.data.fsoId == request.auth.uid;
-
-      // Farmer can read their own requests
-      allow read: if isAuthenticated() && resource.data.farmerId == request.auth.uid;
-
-      // Admin can read/write all; vet can read pending (vetId == null)
-      allow read, write: if hasRole('admin');
-      allow read: if hasRole('vet') && resource.data.status == 'pending';
-      allow update: if hasRole('vet');
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // transactions collection
-    // ═══════════════════════════════════════════════════════════
-    match /transactions/{transactionId} {
-      // Users can read their own transactions
-      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
-
-      // Admin and fund_manager can read/write all transactions
-      allow read, write: if hasAnyRole(['admin', 'fund_manager']);
-
-      // Authenticated users can create transactions (e.g., deposit)
-      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+    match /{document=**} {
+      // This rule allows anyone with your database reference to view, edit,
+      // and delete all data in your database. It is useful for getting
+      // started, but it is configured to expire after 30 days because it
+      // leaves your app open to attackers. At that time, all client
+      // requests to your database will be denied.
+      //
+      // Make sure to write security rules for your app before that time, or
+      // else all client requests to your database will be denied until you
+      // update your rules.
+      allow read, write: if request.time < timestamp.date(2026, 5, 25);
     }
   }
 }

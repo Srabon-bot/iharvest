@@ -22,7 +22,7 @@ import { COLLECTIONS } from '../utils/constants.js';
  *
  * Used by: **Admin**.
  *
- * @param {{ name: string, type: string, price: number, livestockCount: number, durationMonths: number, expectedROI: number }} data
+ * @param {{ name: string, type: string, price: number, livestockCount: number, durationMonths: number, investorSplit: number, farmerSplit: number, historicalROI: number }} data
  * @returns {Promise<string>} The new package document ID
  */
 export async function createPackage(data) {
@@ -33,7 +33,9 @@ export async function createPackage(data) {
       price: data.price,
       livestockCount: data.livestockCount,
       durationMonths: data.durationMonths,
-      expectedROI: data.expectedROI,
+      investorSplit: data.investorSplit || 40,
+      farmerSplit: data.farmerSplit || 60,
+      historicalROI: data.historicalROI || 0,
       isActive: true,
     };
     return await addDocument(COLLECTIONS.PACKAGES, packageData);
@@ -48,7 +50,7 @@ export async function createPackage(data) {
  *
  * Used by: **Admin** (package management).
  *
- * @returns {Promise<Array<{ id: string, name: string, type: string, price: number, livestockCount: number, durationMonths: number, expectedROI: number, isActive: boolean }>>}
+ * @returns {Promise<Array<{ id: string, name: string, type: string, price: number, livestockCount: number, durationMonths: number, investorSplit: number, farmerSplit: number, historicalROI: number, isActive: boolean }>>}
  */
 export async function getAllPackages() {
   try {
@@ -64,7 +66,7 @@ export async function getAllPackages() {
  *
  * Used by: **Investor** (marketplace), **All authenticated users**.
  *
- * @returns {Promise<Array<{ id: string, name: string, type: string, price: number, livestockCount: number, durationMonths: number, expectedROI: number }>>}
+ * @returns {Promise<Array<{ id: string, name: string, type: string, price: number, livestockCount: number, durationMonths: number, investorSplit: number, farmerSplit: number, historicalROI: number }>>}
  */
 export async function getActivePackages() {
   try {
@@ -85,7 +87,7 @@ export async function getActivePackages() {
  * Used by: **Investor** (package detail view), **Admin**.
  *
  * @param {string} packageId
- * @returns {Promise<{ id: string, name: string, type: string, price: number, livestockCount: number, durationMonths: number, expectedROI: number, isActive: boolean } | null>}
+ * @returns {Promise<{ id: string, name: string, type: string, price: number, livestockCount: number, durationMonths: number, investorSplit: number, farmerSplit: number, historicalROI: number, isActive: boolean } | null>}
  */
 export async function getPackageById(packageId) {
   try {

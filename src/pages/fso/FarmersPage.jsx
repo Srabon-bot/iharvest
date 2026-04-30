@@ -7,15 +7,7 @@ import { getUsersByRole } from '../../services/userService';
 import { ROLES } from '../../utils/constants';
 import { Users } from 'lucide-react';
 
-const SEED_FARMERS = [
-    { id: 'f1', name: 'Ali Khan', email: 'ali@iharvest.com', isActive: true, assignedClusterId: 'CLS-NORTH' },
-    { id: 'f2', name: 'Sarah Connor', email: 'sarah@iharvest.com', isActive: true, assignedClusterId: 'CLS-EAST' },
-    { id: 'f3', name: 'Tom Brown', email: 'tom@iharvest.com', isActive: false, assignedClusterId: 'CLS-NORTH' },
-    { id: 'f4', name: 'Maria Silva', email: 'maria@iharvest.com', isActive: true, assignedClusterId: 'CLS-SOUTH' },
-];
-
-const FarmersPage = () => {
-    const [farmers, setFarmers] = useState(SEED_FARMERS);
+    const [farmers, setFarmers] = useState([]);
 
     useEffect(() => {
         (async () => {

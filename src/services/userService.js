@@ -12,6 +12,7 @@ import {
   getDocument,
   updateDocument,
   where,
+  setDocument,
 } from '../firebase/firestore.js';
 import { COLLECTIONS } from '../utils/constants.js';
 
@@ -132,6 +133,27 @@ export async function updateUserProfile(uid, data) {
     await updateDocument(COLLECTIONS.USERS, uid, data);
   } catch (error) {
     console.error('[userService.updateUserProfile]', error);
+    throw error;
+  }
+}
+/**
+ * Create a new user profile document in Firestore.
+ * This is used by admins to pre-initialize accounts.
+ *
+ * @param {string} uid
+ * @param {object} data - { name, email, role, isActive, ... }
+ * @returns {Promise<void>}
+ */
+export async function createUserProfile(uid, data) {
+  try {
+    const profileData = {
+      uid,
+      isActive: true,
+      ...data,
+    };
+    await setDocument(COLLECTIONS.USERS, uid, profileData);
+  } catch (error) {
+    console.error('[userService.createUserProfile]', error);
     throw error;
   }
 }

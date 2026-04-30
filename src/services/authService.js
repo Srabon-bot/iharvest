@@ -15,8 +15,10 @@ import {
   firebaseLogout,
   firebaseResetPassword,
   onAuthChange as firebaseOnAuthChange,
+  firebaseAdminRegister,
 } from '../firebase/auth.js';
 import { getDocument, setDocument } from '../firebase/firestore.js';
+import { firebaseConfig } from '../firebase/config.js';
 import { COLLECTIONS, ROLES } from '../utils/constants.js';
 
 const USE_MOCK_AUTH = import.meta.env.VITE_USE_MOCK_AUTH === 'true';
@@ -51,7 +53,7 @@ const setMockUser = (user) => {
 
 const generateMockProfile = (email) => {
   const rolePrefix = email.split('@')[0]; // e.g., 'admin', 'farmer'
-  
+
   // map prefix to actual roles
   const roleMap = {
     'admin': ROLES.ADMIN,
@@ -59,12 +61,11 @@ const generateMockProfile = (email) => {
     'investor': ROLES.INVESTOR,
     'vet': ROLES.VET,
     'fso': ROLES.FSO,
-    'manager': ROLES.CLUSTER_MANAGER,
-    'fund': ROLES.FUND_MANAGER
+    'manager': ROLES.CLUSTER_MANAGER
   };
-  
+
   const role = roleMap[rolePrefix] || ROLES.INVESTOR;
-  
+
   return {
     uid: `mock-uid-${rolePrefix}`,
     email,
@@ -105,6 +106,37 @@ export async function registerUser(email, password, name, role = ROLES.INVESTOR,
     return { uid, email, role };
   } catch (error) {
     console.error('[authService.registerUser]', error);
+    throw error;
+  }
+}
+
+/**
+ * Admin creates a new staff account without logging out.
+ */
+export async function createStaffAccount(email, password, name, role, extraData = {}) {
+  if (USE_MOCK_AUTH) {
+    await new Promise(r => setTimeout(r, 800));
+    const uid = `mock-uid-${Date.now()}`;
+    const profileData = { uid, name, email, role, isActive: true, ...extraData };
+    return profileData; // Don't setMockUser because it would switch sessions
+  }
+
+  try {
+    const uid = await firebaseAdminRegister(email, password, name, firebaseConfig);
+
+    const profileData = {
+      uid,
+      name,
+      email,
+      role,
+      isActive: true,
+      ...extraData,
+    };
+
+    await setDocument(COLLECTIONS.USERS, uid, profileData);
+    return profileData;
+  } catch (error) {
+    console.error('[authService.createStaffAccount]', error);
     throw error;
   }
 }
@@ -204,4 +236,31 @@ export function onAuthChange(callback) {
   }
 
   return firebaseOnAuthChange(callback);
+}
+
+/**
+ * Initialize the first Admin profile in Firestore.
+ * This is used for the "Going Live" setup process.
+ */
+export async function initializeAdminProfile(uid, email, name) {
+  if (USE_MOCK_AUTH) {
+    await new Promise(r => setTimeout(r, 500));
+    return { uid, email, name, role: ROLES.ADMIN, isActive: true };
+  }
+
+  try {
+    const profileData = {
+      uid,
+      name,
+      email,
+      role: ROLES.ADMIN,
+      isActive: true,
+    };
+
+    await setDocument(COLLECTIONS.USERS, uid, profileData);
+    return profileData;
+  } catch (error) {
+    console.error('[authService.initializeAdminProfile]', error);
+    throw error;
+  }
 }

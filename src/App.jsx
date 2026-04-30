@@ -12,12 +12,12 @@ import DesignSystemDemo from './pages/DesignSystemDemo.jsx';
 
 // Dashboards
 import AdminDashboard from './pages/dashboards/AdminDashboard.jsx';
+import AdminSetup from './pages/AdminSetup.jsx';
 import FarmerDashboard from './pages/dashboards/FarmerDashboard.jsx';
 import InvestorDashboard from './pages/dashboards/InvestorDashboard.jsx';
 import VetDashboard from './pages/dashboards/VetDashboard.jsx';
 import FsoDashboard from './pages/dashboards/FsoDashboard.jsx';
 import ManagerDashboard from './pages/dashboards/ManagerDashboard.jsx';
-import FundManagerDashboard from './pages/dashboards/FundManagerDashboard.jsx';
 
 // Admin sub-pages
 import UsersPage from './pages/admin/UsersPage.jsx';
@@ -69,6 +69,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/login" element={user ? <Navigate to={getRootRedirect()} replace /> : <Login />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="/init-admin" element={<AdminSetup />} />
         {/* Design system demo — dev only */}
         {import.meta.env.DEV && <Route path="/design" element={<DesignSystemDemo />} />}
 
@@ -116,11 +117,6 @@ function App() {
           <Route path={ROLE_DASHBOARD[ROLES.CLUSTER_MANAGER]} element={<ManagerDashboard />} />
           <Route path="/manager/clusters" element={<ClustersPage />} />
           <Route path="/manager/deliveries" element={<DeliveriesPage />} />
-        </Route>
-
-        {/* ══ Fund Manager ══ */}
-        <Route element={<RoleRoute roles={[ROLES.FUND_MANAGER]} />}>
-          <Route path={ROLE_DASHBOARD[ROLES.FUND_MANAGER]} element={<FundManagerDashboard />} />
         </Route>
 
         {/* Fallback */}

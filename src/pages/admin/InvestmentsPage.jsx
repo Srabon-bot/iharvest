@@ -9,16 +9,19 @@ import StatusBadge from '../../components/ui/StatusBadge';
 import { getAllPackages, createPackage, updatePackage } from '../../services/packageService';
 import { PieChart, Plus, PackageOpen } from 'lucide-react';
 
-const SEED_PACKAGES = [
-    { id: 'pkg1', name: 'Broiler Batch 500', type: 'Chicken', price: 1500, livestockCount: 500, durationMonths: 6, expectedROI: 12, isActive: true },
-    { id: 'pkg2', name: 'Dairy Cow Unit', type: 'Cattle', price: 2000, livestockCount: 5, durationMonths: 12, expectedROI: 15, isActive: true },
-    { id: 'pkg3', name: 'Layer Hen Pack', type: 'Chicken', price: 900, livestockCount: 300, durationMonths: 8, expectedROI: 10, isActive: false },
-];
-
-const EMPTY_FORM = { name: '', type: 'Chicken', price: '', livestockCount: '', durationMonths: '', expectedROI: '' };
+const EMPTY_FORM = { 
+    name: '', 
+    type: 'Chicken', 
+    price: '', 
+    livestockCount: '', 
+    durationMonths: '', 
+    investorSplit: 40,
+    farmerSplit: 60,
+    historicalROI: 0
+};
 
 const InvestmentsPage = () => {
-    const [packages, setPackages] = useState(SEED_PACKAGES);
+    const [packages, setPackages] = useState([]);
     const [showCreate, setShowCreate] = useState(false);
     const [form, setForm] = useState(EMPTY_FORM);
     const [saving, setSaving] = useState(false);
@@ -27,7 +30,9 @@ const InvestmentsPage = () => {
         try {
             const data = await getAllPackages();
             if (data && data.length) setPackages(data);
-        } catch { /* keep seed */ }
+        } catch (e) {
+            console.error('Failed to load packages', e);
+        }
     };
 
     useEffect(() => { load(); }, []);
@@ -35,25 +40,34 @@ const InvestmentsPage = () => {
     const handleCreate = async () => {
         setSaving(true);
         const pkg = {
-            name: form.name, type: form.type,
-            price: Number(form.price), livestockCount: Number(form.livestockCount),
-            durationMonths: Number(form.durationMonths), expectedROI: Number(form.expectedROI),
+            name: form.name, 
+            type: form.type,
+            price: Number(form.price), 
+            livestockCount: Number(form.livestockCount),
+            durationMonths: Number(form.durationMonths), 
+            investorSplit: Number(form.investorSplit),
+            farmerSplit: Number(form.farmerSplit),
+            historicalROI: Number(form.historicalROI)
         };
         try {
             const id = await createPackage(pkg);
             setPackages((p) => [{ ...pkg, id, isActive: true }, ...p]);
-        } catch {
-            setPackages((p) => [{ ...pkg, id: `pkg-${Date.now()}`, isActive: true }, ...p]);
-        } finally {
-            setSaving(false);
             setShowCreate(false);
             setForm(EMPTY_FORM);
+        } catch (e) {
+            console.error('Failed to create package', e);
+        } finally {
+            setSaving(false);
         }
     };
 
     const toggleActive = async (pkg) => {
-        try { await updatePackage(pkg.id, { isActive: !pkg.isActive }); } catch { /* mock */ }
-        setPackages((p) => p.map((x) => x.id === pkg.id ? { ...x, isActive: !x.isActive } : x));
+        try { 
+            await updatePackage(pkg.id, { isActive: !pkg.isActive }); 
+            setPackages((p) => p.map((x) => x.id === pkg.id ? { ...x, isActive: !x.isActive } : x));
+        } catch (e) {
+            console.error('Failed to update package', e);
+        }
     };
 
     const columns = [
@@ -62,7 +76,7 @@ const InvestmentsPage = () => {
         { header: 'Price', accessor: 'price', render: (v) => `$${Number(v).toLocaleString()}` },
         { header: 'Livestock', accessor: 'livestockCount' },
         { header: 'Duration', accessor: 'durationMonths', render: (v) => `${v} mo` },
-        { header: 'Est. ROI', accessor: 'expectedROI', render: (v) => `${v}%` },
+        { header: 'Investor Split', accessor: 'investorSplit', render: (v) => `${v}%` },
         { header: 'Status', accessor: 'isActive', render: (v) => <StatusBadge status={v ? 'active' : 'inactive'} /> },
         {
             header: 'Actions', accessor: 'id',
@@ -81,7 +95,7 @@ const InvestmentsPage = () => {
                     <h1 style={{ fontSize: '2rem', color: 'var(--text-primary)', marginBottom: 'var(--spacing-xs)' }}>
                         Investment Packages
                     </h1>
-                    <p style={{ color: 'var(--text-secondary)' }}>Manage, create, and deactivate investment packages.</p>
+                    <p style={{ color: 'var(--text-secondary)' }}>Manage, create, and deactivate Mudarabah investment packages.</p>
                 </div>
                 <Button variant="primary" onClick={() => setShowCreate(true)}>
                     <Plus size={16} /> Create Package
@@ -122,13 +136,15 @@ const InvestmentsPage = () => {
                         </select>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
-                        <Input label="Price (USD)" type="number" placeholder="1500" value={form.price} onChange={(e) => setForm(f => ({ ...f, price: e.target.value }))} />
+                        <Input label="Price (Capital)" type="number" placeholder="1500" value={form.price} onChange={(e) => setForm(f => ({ ...f, price: e.target.value }))} />
                         <Input label="Livestock Count" type="number" placeholder="500" value={form.livestockCount} onChange={(e) => setForm(f => ({ ...f, livestockCount: e.target.value }))} />
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
-                        <Input label="Duration (months)" type="number" placeholder="6" value={form.durationMonths} onChange={(e) => setForm(f => ({ ...f, durationMonths: e.target.value }))} />
-                        <Input label="Expected ROI (%)" type="number" placeholder="12" value={form.expectedROI} onChange={(e) => setForm(f => ({ ...f, expectedROI: e.target.value }))} />
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--spacing-md)' }}>
+                        <Input label="Duration (mos)" type="number" placeholder="6" value={form.durationMonths} onChange={(e) => setForm(f => ({ ...f, durationMonths: e.target.value }))} />
+                        <Input label="Inv. Split (%)" type="number" placeholder="40" value={form.investorSplit} onChange={(e) => setForm(f => ({ ...f, investorSplit: e.target.value, farmerSplit: 100 - Number(e.target.value) }))} />
+                        <Input label="Farm. Split (%)" type="number" placeholder="60" value={form.farmerSplit} disabled />
                     </div>
+                    <Input label="Historical ROI (%) (for Display)" type="number" placeholder="12" value={form.historicalROI} onChange={(e) => setForm(f => ({ ...f, historicalROI: e.target.value }))} />
                 </div>
             </Modal>
         </DashboardLayout>

@@ -6,17 +6,12 @@ import StatusBadge from '../../components/ui/StatusBadge';
 import { getAllUsers } from '../../services/userService';
 import { getAllLivestock } from '../../services/livestockService';
 import { getAllInvestments } from '../../services/investmentService';
+import { formatBDT } from '../../utils/formatters';
 import { Users, DollarSign, Activity, Tractor } from 'lucide-react';
 
-const SEED_USERS = [
-  { id: 1, name: 'Alice Ahmed', email: 'alice@iharvest.com', role: 'investor', isActive: true },
-  { id: 2, name: 'Ben Farmer', email: 'ben@iharvest.com', role: 'farmer', isActive: true },
-  { id: 3, name: 'Dr. Clara Vet', email: 'clara@iharvest.com', role: 'vet', isActive: true },
-];
-
 const AdminDashboard = () => {
-  const [stats, setStats] = useState({ users: 1245, livestock: 84, investments: 2400000 });
-  const [recentUsers, setRecentUsers] = useState(SEED_USERS);
+  const [stats, setStats] = useState({ users: 0, livestock: 0, investments: 0 });
+  const [recentUsers, setRecentUsers] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -24,14 +19,12 @@ const AdminDashboard = () => {
         const [users, livestock, investments] = await Promise.all([
           getAllUsers(), getAllLivestock(), getAllInvestments()
         ]);
-        if (users.length) {
-          setStats({
-            users: users.length,
-            livestock: livestock.length,
-            investments: investments.reduce((s, i) => s + (Number(i.amount) || 0), 0),
-          });
-          setRecentUsers(users.slice(0, 5));
-        }
+        setStats({
+          users: users?.length || 0,
+          livestock: livestock?.length || 0,
+          investments: (investments || []).reduce((s, i) => s + (Number(i.amount) || 0), 0),
+        });
+        setRecentUsers((users || []).slice(0, 5));
       } catch { /* use seed */ }
     })();
   }, []);
@@ -55,7 +48,7 @@ const AdminDashboard = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--spacing-lg)', marginBottom: 'var(--spacing-xl)' }}>
         <Card variant="stat" title="Total Users" value={stats.users.toLocaleString()} icon={Users} trend={{ value: 12, isPositive: true }} />
         <Card variant="stat" title="Active Livestock Batches" value={stats.livestock.toLocaleString()} icon={Tractor} trend={{ value: 5, isPositive: true }} />
-        <Card variant="stat" title="Total Investments" value={`$${(stats.investments / 1e6).toFixed(1)}M`} icon={DollarSign} trend={{ value: 18, isPositive: true }} />
+        <Card variant="stat" title="Total Investments" value={formatBDT(stats.investments)} icon={DollarSign} trend={{ value: 18, isPositive: true }} />
         <Card variant="stat" title="System Health" value="99.9%" icon={Activity} />
       </div>
 

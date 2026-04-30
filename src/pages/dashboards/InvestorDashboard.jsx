@@ -6,13 +6,10 @@ import StatusBadge from '../../components/ui/StatusBadge';
 import TraceabilityView from '../../components/ui/TraceabilityView';
 import { getInvestmentsByInvestor } from '../../services/investmentService';
 import { getActivePackages } from '../../services/packageService';
+import { getTransactionsByUser } from '../../services/transactionService';
 import { useAuth } from '../../hooks/useAuth';
+import { formatBDT } from '../../utils/formatters';
 import { Briefcase, TrendingUp, DollarSign, PackageOpen } from 'lucide-react';
-
-const SEED_INVESTMENTS = [
-  { id: 'INV-001', packageId: 'pkg1', amount: 1500, expectedROI: 12, currentROI: 5.2, status: 'active', startDate: '2026-01-01', endDate: '2026-07-01' },
-  { id: 'INV-002', packageId: 'pkg2', amount: 2000, expectedROI: 15, currentROI: 0, status: 'active', startDate: '2026-02-01', endDate: '2027-02-01' },
-];
 
 const DEMO_TRACE = {
   investor: { name: 'Demo Investor', id: 'INV-001' },
@@ -24,32 +21,49 @@ const DEMO_TRACE = {
 
 const InvestorDashboard = () => {
   const { user } = useAuth();
-  const [investments, setInvestments] = useState(SEED_INVESTMENTS);
-  const [availablePackages, setAvailablePackages] = useState(8);
+  const [investments, setInvestments] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [availablePackages, setAvailablePackages] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
+      if (!user?.uid) return;
       try {
-        const [inv, pkgs] = await Promise.all([
-          getInvestmentsByInvestor(user?.uid || 'demo'),
+        const [inv, pkgs, txs] = await Promise.all([
+          getInvestmentsByInvestor(user.uid),
           getActivePackages(),
+          getTransactionsByUser(user.uid),
         ]);
-        if (inv.length) setInvestments(inv);
-        if (pkgs.length) setAvailablePackages(pkgs.length);
-      } catch { /* use seed */ }
+        setInvestments(inv || []);
+        setAvailablePackages(pkgs?.length || 0);
+        setTransactions(txs || []);
+      } catch (error) {
+        console.error('Error fetching investor data:', error);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, [user]);
 
   const totalInvested = investments.reduce((s, i) => s + Number(i.amount || 0), 0);
-  const estReturns = investments.reduce((s, i) => s + Number(i.amount || 0) * Number(i.expectedROI || 0) / 100, 0);
+  
+  // Calculate est returns based on active vs completed
+  const totalPayouts = investments
+    .filter(i => i.status === 'completed' && i.financials)
+    .reduce((s, i) => s + Number(i.financials.investorPayout || 0), 0);
+
+  const walletBalance = transactions
+    .filter(t => t.status === 'completed')
+    .reduce((sum, t) => t.type === 'payout' ? sum + t.amount : sum - t.amount, 0);
 
   const columns = [
     { header: 'Investment ID', accessor: 'id' },
     { header: 'Package', accessor: 'packageId' },
-    { header: 'Amount', accessor: 'amount', render: (v) => `$${Number(v).toLocaleString()}` },
-    { header: 'Est. ROI', accessor: 'expectedROI', render: (v) => `${v}%` },
-    { header: 'Current ROI', accessor: 'currentROI', render: (v) => <span style={{ color: '#16a34a', fontWeight: 600 }}>{v}%</span> },
+    { header: 'Capital', accessor: 'amount', render: (v) => formatBDT(v) },
+    { header: 'Profit Split', accessor: 'investorSplit', render: (v) => `${v || 40}%` },
     { header: 'Status', accessor: 'status', render: (v) => <StatusBadge status={v} /> },
+    { header: 'Payout', accessor: 'financials', render: (v) => v ? formatBDT(v.investorPayout) : '—' },
     { header: 'End Date', accessor: 'endDate', render: (v) => v ? new Date(v).toLocaleDateString() : '—' },
   ];
 
@@ -59,19 +73,25 @@ const InvestorDashboard = () => {
         <h1 style={{ fontSize: '2rem', color: 'var(--text-primary)', marginBottom: 'var(--spacing-xs)' }}>
           Investor Portfolio
         </h1>
-        <p style={{ color: 'var(--text-secondary)' }}>Track your assets, ROIs, and find new opportunities.</p>
+        <p style={{ color: 'var(--text-secondary)' }}>Track your active Mudarabah contracts, profit shares, and wallet.</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--spacing-lg)', marginBottom: 'var(--spacing-xl)' }}>
-        <Card variant="stat" title="Total Invested" value={`$${totalInvested.toLocaleString()}`} icon={Briefcase} />
-        <Card variant="stat" title="Est. Returns" value={`$${Math.round(estReturns).toLocaleString()}`} icon={TrendingUp} trend={{ value: estReturns > 0 ? Math.round(estReturns / totalInvested * 100) : 0, isPositive: true }} />
-        <Card variant="stat" title="Wallet Balance" value="$1,250" icon={DollarSign} />
+        <Card variant="stat" title="Total Capital Deployed" value={formatBDT(totalInvested)} icon={Briefcase} />
+        <Card variant="stat" title="Total Payouts Received" value={formatBDT(totalPayouts)} icon={TrendingUp} trend={{ value: totalPayouts > 0 ? 100 : 0, isPositive: true }} />
+        <Card variant="stat" title="Wallet Balance" value={formatBDT(walletBalance)} icon={DollarSign} />
         <Card variant="stat" title="Available Packages" value={String(availablePackages)} icon={PackageOpen} />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 'var(--spacing-lg)' }}>
-        <Card title="Your Active Investments">
-          <Table columns={columns} data={investments} searchable pageSize={8} />
+        <Card title="Your Investments">
+          {loading ? (
+            <p style={{ padding: '0 var(--spacing-lg)', color: 'var(--text-secondary)' }}>Loading portfolio...</p>
+          ) : investments.length === 0 ? (
+            <p style={{ padding: '0 var(--spacing-lg)', color: 'var(--text-secondary)' }}>You haven't made any investments yet. Check the Marketplace!</p>
+          ) : (
+            <Table columns={columns} data={investments} searchable pageSize={8} />
+          )}
         </Card>
 
         <Card title="Investment Traceability — Sample">

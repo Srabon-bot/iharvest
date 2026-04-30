@@ -5,27 +5,24 @@ import Table from '../../components/ui/Table';
 import StatusBadge from '../../components/ui/StatusBadge';
 import { getTransactionsByUser } from '../../services/transactionService';
 import { useAuth } from '../../hooks/useAuth';
+import { formatBDT } from '../../utils/formatters';
 import { DollarSign, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
-
-const SEED_TRANSACTIONS = [
-    { id: 'TXN-001', type: 'deposit', amount: 1500, description: 'Investment in Broiler Batch 500', status: 'completed', createdAt: '2026-04-01' },
-    { id: 'TXN-002', type: 'deposit', amount: 2000, description: 'Investment in Dairy Cow Unit', status: 'completed', createdAt: '2026-03-15' },
-    { id: 'TXN-003', type: 'payout', amount: 180, description: 'Q1 ROI Payout — Broiler Batch 001', status: 'completed', createdAt: '2026-03-31' },
-    { id: 'TXN-004', type: 'deposit', amount: 900, description: 'Investment in Layer Hen Pack', status: 'pending', createdAt: '2026-04-20' },
-];
 
 const TransactionsPage = () => {
     const { user } = useAuth();
-    const [transactions, setTransactions] = useState(SEED_TRANSACTIONS);
+    const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         (async () => {
             setLoading(true);
             try {
-                const data = await getTransactionsByUser(user?.uid || 'demo');
-                if (data && data.length) setTransactions(data);
-            } catch { /* keep seed */ }
+                if (!user?.uid) return;
+                const data = await getTransactionsByUser(user.uid);
+                setTransactions(data || []);
+            } catch (error) {
+                console.error('Error fetching transactions:', error);
+            }
             finally {
                 setLoading(false);
             }
@@ -46,7 +43,7 @@ const TransactionsPage = () => {
                 </span>
             )
         },
-        { header: 'Amount', accessor: 'amount', render: (v, row) => <span style={{ color: row.type === 'payout' ? '#16a34a' : 'var(--text-primary)', fontWeight: 600 }}>{row.type === 'payout' ? '+' : '-'}${Number(v).toLocaleString()}</span> },
+        { header: 'Amount', accessor: 'amount', render: (v, row) => <span style={{ color: row.type === 'payout' ? '#16a34a' : 'var(--text-primary)', fontWeight: 600 }}>{row.type === 'payout' ? '+' : '-'}{formatBDT(v)}</span> },
         { header: 'Description', accessor: 'description' },
         { header: 'Status', accessor: 'status', render: (v) => <StatusBadge status={v} /> },
         { header: 'Date', accessor: 'createdAt' },
@@ -59,8 +56,8 @@ const TransactionsPage = () => {
                 <p style={{ color: 'var(--text-secondary)' }}>All your deposits, investments, and payout records.</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 'var(--spacing-lg)', marginBottom: 'var(--spacing-xl)' }}>
-                <Card variant="stat" title="Total Invested" value={`$${totalDeposits.toLocaleString()}`} icon={DollarSign} />
-                <Card variant="stat" title="Total Payouts" value={`$${totalPayouts.toLocaleString()}`} icon={ArrowUpRight} trend={{ value: totalPayouts, isPositive: true }} />
+                <Card variant="stat" title="Total Invested" value={formatBDT(totalDeposits)} icon={DollarSign} />
+                <Card variant="stat" title="Total Payouts" value={formatBDT(totalPayouts)} icon={ArrowUpRight} trend={{ value: totalPayouts, isPositive: true }} />
             </div>
             <Card title="All Transactions">
                 {loading ? <p style={{ padding: 'var(--spacing-lg)', color: 'var(--text-secondary)' }}>Loading…</p>

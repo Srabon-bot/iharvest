@@ -14,14 +14,15 @@ import {
   where,
   orderBy,
 } from '../firebase/firestore.js';
-import { COLLECTIONS, INVESTMENT_STATUS } from '../utils/constants.js';
+import { COLLECTIONS, INVESTMENT_STATUS, TRANSACTION_TYPES, TRANSACTION_STATUS } from '../utils/constants.js';
+import { createTransaction, updateTransactionStatus } from './transactionService.js';
 
 /**
  * Create a new investment record when an investor purchases a package.
  *
- * Used by: **Investor**, **Fund Manager**.
+ * Used by: **Investor**, **Admin**.
  *
- * @param {{ investorId: string, packageId: string, livestockIds: string[], amount: number, expectedROI: number, durationMonths: number }} data
+ * @param {{ investorId: string, packageId: string, livestockIds: string[], amount: number, investorSplit: number, farmerSplit: number, durationMonths: number }} data
  * @returns {Promise<string>} The new investment document ID
  */
 export async function createInvestment(data) {
@@ -35,8 +36,8 @@ export async function createInvestment(data) {
       packageId: data.packageId,
       livestockIds: data.livestockIds || [],
       amount: data.amount,
-      expectedROI: data.expectedROI,
-      currentROI: 0,
+      investorSplit: data.investorSplit || 40,
+      farmerSplit: data.farmerSplit || 60,
       status: INVESTMENT_STATUS.ACTIVE,
       startDate: now.toISOString(),
       endDate: endDate.toISOString(),
@@ -54,7 +55,7 @@ export async function createInvestment(data) {
  * Used by: **Investor** (portfolio dashboard).
  *
  * @param {string} investorId
- * @returns {Promise<Array<{ id: string, packageId: string, amount: number, expectedROI: number, currentROI: number, status: string }>>}
+ * @returns {Promise<Array<{ id: string, packageId: string, amount: number, investorSplit: number, status: string }>>}
  */
 export async function getInvestmentsByInvestor(investorId) {
   try {
@@ -135,6 +136,67 @@ export async function completeInvestment(investmentId) {
     });
   } catch (error) {
     console.error('[investmentService.completeInvestment]', error);
+    throw error;
+  }
+}
+
+/**
+ * Complete an investment cycle using the Profit-Sharing model.
+ * Calculates net profit and triggers payouts for Investor and Farmer.
+ *
+ * @param {string} investmentId
+ * @param {string} farmerId
+ * @param {number} grossRevenue
+ * @param {number} totalExpenses
+ * @returns {Promise<{ netProfit: number, investorPayout: number, farmerPayout: number }>}
+ */
+export async function completeInvestmentCycle(investmentId, farmerId, grossRevenue, totalExpenses) {
+  try {
+    const investment = await getInvestmentById(investmentId);
+    if (!investment) throw new Error('Investment not found');
+
+    const netProfit = Math.max(0, grossRevenue - investment.amount - totalExpenses);
+    
+    const investorShare = netProfit * (investment.investorSplit / 100);
+    const farmerShare = netProfit * (investment.farmerSplit / 100);
+    
+    const investorPayout = investment.amount + investorShare;
+    const farmerPayout = farmerShare;
+
+    // Update investment document
+    await updateDocument(COLLECTIONS.INVESTMENTS, investmentId, {
+      status: INVESTMENT_STATUS.COMPLETED,
+      financials: {
+        grossRevenue,
+        totalExpenses,
+        netProfit,
+        investorPayout,
+        farmerPayout
+      }
+    });
+
+    // Create Transaction for Investor
+    const invTxId = await createTransaction({
+      userId: investment.investorId,
+      amount: investorPayout,
+      type: TRANSACTION_TYPES.PAYOUT,
+      description: `Cycle completion payout (Capital + ${investment.investorSplit}% Profit)`
+    });
+    // Auto-complete it for this demo
+    await updateTransactionStatus(invTxId, TRANSACTION_STATUS.COMPLETED);
+
+    // Create Transaction for Farmer
+    const farmTxId = await createTransaction({
+      userId: farmerId,
+      amount: farmerPayout,
+      type: TRANSACTION_TYPES.PAYOUT,
+      description: `Cycle completion payout (${investment.farmerSplit}% Profit Share)`
+    });
+    await updateTransactionStatus(farmTxId, TRANSACTION_STATUS.COMPLETED);
+
+    return { netProfit, investorPayout, farmerPayout };
+  } catch (error) {
+    console.error('[investmentService.completeInvestmentCycle]', error);
     throw error;
   }
 }

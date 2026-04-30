@@ -6,16 +6,8 @@ import StatusBadge from '../../components/ui/StatusBadge';
 import { getAllLivestock } from '../../services/livestockService';
 import { Bird, Activity, AlertTriangle } from 'lucide-react';
 
-const SEED_LIVESTOCK = [
-    { id: 'ls1', type: 'Broiler Chicken', quantity: 500, status: 'active', farmerId: 'f1', fsoId: 'fso1', clusterId: 'cls1' },
-    { id: 'ls2', type: 'Broiler Chicken', quantity: 480, status: 'active', farmerId: 'f2', fsoId: 'fso1', clusterId: 'cls1' },
-    { id: 'ls3', type: 'Dairy Cattle', quantity: 5, status: 'active', farmerId: 'f3', fsoId: 'fso2', clusterId: 'cls2' },
-    { id: 'ls4', type: 'Broiler Chicken', quantity: 200, status: 'sold', farmerId: 'f1', fsoId: 'fso1', clusterId: 'cls1' },
-    { id: 'ls5', type: 'Dairy Cattle', quantity: 3, status: 'dead', farmerId: 'f4', fsoId: 'fso2', clusterId: 'cls2' },
-];
-
 const FarmsPage = () => {
-    const [livestock, setLivestock] = useState(SEED_LIVESTOCK);
+    const [livestock, setLivestock] = useState([]);
 
     useEffect(() => {
         (async () => {

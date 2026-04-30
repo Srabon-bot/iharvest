@@ -7,20 +7,14 @@ import StatusBadge from '../../components/ui/StatusBadge';
 import { getActivePackages } from '../../services/packageService';
 import { createInvestment } from '../../services/investmentService';
 import { useAuth } from '../../hooks/useAuth';
-import { PackageOpen, TrendingUp, DollarSign, Clock } from 'lucide-react';
-
-const SEED_PACKAGES = [
-    { id: 'pkg1', name: 'Broiler Batch 500', type: 'Chicken', price: 1500, livestockCount: 500, durationMonths: 6, expectedROI: 12, isActive: true },
-    { id: 'pkg2', name: 'Dairy Cow Unit', type: 'Cattle', price: 2000, livestockCount: 5, durationMonths: 12, expectedROI: 15, isActive: true },
-    { id: 'pkg3', name: 'Layer Hen Pack', type: 'Chicken', price: 900, livestockCount: 300, durationMonths: 8, expectedROI: 10, isActive: true },
-    { id: 'pkg4', name: 'Premium Cattle', type: 'Cattle', price: 3500, livestockCount: 10, durationMonths: 18, expectedROI: 20, isActive: true },
-];
+import { formatBDT } from '../../utils/formatters';
+import { PackageOpen, TrendingUp, DollarSign, Clock, PieChart } from 'lucide-react';
 
 const TYPE_COLORS = { Chicken: '#16a34a', Cattle: '#2563eb' };
 
 const MarketplacePage = () => {
     const { user } = useAuth();
-    const [packages, setPackages] = useState(SEED_PACKAGES);
+    const [packages, setPackages] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selected, setSelected] = useState(null);
     const [investing, setInvesting] = useState(false);
@@ -28,10 +22,15 @@ const MarketplacePage = () => {
 
     useEffect(() => {
         (async () => {
+            setLoading(true);
             try {
                 const data = await getActivePackages();
                 if (data && data.length) setPackages(data);
-            } catch { /* keep seed */ }
+            } catch (e) {
+                console.error("Failed to load packages", e);
+            } finally {
+                setLoading(false);
+            }
         })();
     }, []);
 
@@ -43,24 +42,30 @@ const MarketplacePage = () => {
                 packageId: selected.id,
                 livestockIds: [],
                 amount: selected.price,
-                expectedROI: selected.expectedROI,
+                investorSplit: selected.investorSplit || 40,
+                farmerSplit: selected.farmerSplit || 60,
                 durationMonths: selected.durationMonths,
             });
-        } catch { /* mock */ }
-        setInvested((s) => new Set([...s, selected.id]));
-        setInvesting(false);
-        setSelected(null);
+            setInvested((s) => new Set([...s, selected.id]));
+        } catch (e) {
+            console.error("Failed to invest", e);
+        } finally {
+            setInvesting(false);
+            setSelected(null);
+        }
     };
 
     return (
         <DashboardLayout>
             <div style={{ marginBottom: 'var(--spacing-xl)' }}>
                 <h1 style={{ fontSize: '2rem', color: 'var(--text-primary)', marginBottom: 'var(--spacing-xs)' }}>Investment Marketplace</h1>
-                <p style={{ color: 'var(--text-secondary)' }}>Browse and invest in available livestock packages.</p>
+                <p style={{ color: 'var(--text-secondary)' }}>Browse and invest in available livestock packages using our Profit-Sharing model.</p>
             </div>
 
             {loading ? (
                 <p style={{ color: 'var(--text-secondary)' }}>Loading packages…</p>
+            ) : packages.length === 0 ? (
+                <p style={{ color: 'var(--text-secondary)' }}>No active packages available right now.</p>
             ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 'var(--spacing-lg)' }}>
                     {packages.map((pkg) => (
@@ -75,13 +80,17 @@ const MarketplacePage = () => {
                                         <StatusBadge status={pkg.type} />
                                     </div>
                                     <div style={{ textAlign: 'right' }}>
-                                        <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary, #16a34a)' }}>${Number(pkg.price).toLocaleString()}</div>
+                                        <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary, #16a34a)' }}>{formatBDT(pkg.price)}</div>
                                     </div>
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: 'var(--spacing-lg)' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <TrendingUp size={15} color="#16a34a" />
-                                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>ROI: <strong style={{ color: '#16a34a' }}>{pkg.expectedROI}%</strong></span>
+                                        <PieChart size={15} color="#16a34a" />
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Split: <strong style={{ color: '#16a34a' }}>{pkg.investorSplit}%</strong></span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <TrendingUp size={15} color="var(--text-secondary)" />
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Hist. ROI: <strong>{pkg.historicalROI || 0}%</strong></span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <Clock size={15} color="var(--text-secondary)" />
@@ -90,10 +99,6 @@ const MarketplacePage = () => {
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <PackageOpen size={15} color="var(--text-secondary)" />
                                         <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{pkg.livestockCount} animals</span>
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <DollarSign size={15} color="var(--text-secondary)" />
-                                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Est. +${Math.round(pkg.price * pkg.expectedROI / 100)}</span>
                                     </div>
                                 </div>
                                 <Button
@@ -119,7 +124,7 @@ const MarketplacePage = () => {
                     <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
                         <Button variant="secondary" onClick={() => setSelected(null)}>Cancel</Button>
                         <Button variant="primary" onClick={handleInvest} disabled={investing}>
-                            {investing ? 'Processing…' : `Invest $${selected?.price?.toLocaleString()}`}
+                            {investing ? 'Processing…' : `Invest ${selected?.price ? formatBDT(selected.price) : ''}`}
                         </Button>
                     </div>
                 }
@@ -130,10 +135,12 @@ const MarketplacePage = () => {
                         <div style={{ background: 'var(--bg-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)', border: '1px solid var(--border)' }}>
                             <strong style={{ color: 'var(--text-primary)' }}>{selected.name}</strong>
                             <div style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                                Amount: <strong>${selected.price?.toLocaleString()}</strong> · ROI: <strong>{selected.expectedROI}%</strong> · Duration: <strong>{selected.durationMonths} months</strong>
+                                Capital: <strong>{formatBDT(selected.price)}</strong> · Profit Split: <strong>{selected.investorSplit}%</strong> · Duration: <strong>{selected.durationMonths} months</strong>
                             </div>
                         </div>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>This action will create an investment record tracked on the platform.</p>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                            By investing, you enter a Mudarabah contract. You will receive your initial capital plus {selected.investorSplit}% of the net profit upon successful completion of the cycle.
+                        </p>
                     </div>
                 )}
             </Modal>
