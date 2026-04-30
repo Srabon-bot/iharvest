@@ -104,28 +104,10 @@ const Login = () => {
       </div>
 
       <Card className="login-card">
-        <div className="auth-tabs" style={{ display: 'flex', marginBottom: 'var(--spacing-lg)', borderBottom: '1px solid var(--border)' }}>
-          <button 
-            className={`tab-btn ${activeTab === 'login' ? 'active' : ''}`}
-            onClick={() => setActiveTab('login')}
-            style={{ flex: 1, padding: '10px', background: 'none', border: 'none', borderBottom: activeTab === 'login' ? '2px solid var(--primary-color)' : 'none', fontWeight: activeTab === 'login' ? 'bold' : 'normal', color: activeTab === 'login' ? 'var(--primary-color)' : 'var(--text-secondary)', cursor: 'pointer' }}
-          >
-            Sign In
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'register' ? 'active' : ''}`}
-            onClick={() => setActiveTab('register')}
-            style={{ flex: 1, padding: '10px', background: 'none', border: 'none', borderBottom: activeTab === 'register' ? '2px solid var(--primary-color)' : 'none', fontWeight: activeTab === 'register' ? 'bold' : 'normal', color: activeTab === 'register' ? 'var(--primary-color)' : 'var(--text-secondary)', cursor: 'pointer' }}
-          >
-            Investor Signup
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'apply' ? 'active' : ''}`}
-            onClick={() => setActiveTab('apply')}
-            style={{ flex: 1, padding: '10px', background: 'none', border: 'none', borderBottom: activeTab === 'apply' ? '2px solid var(--primary-color)' : 'none', fontWeight: activeTab === 'apply' ? 'bold' : 'normal', color: activeTab === 'apply' ? 'var(--primary-color)' : 'var(--text-secondary)', cursor: 'pointer' }}
-          >
-            Apply as Farmer
-          </button>
+        <div className="auth-tabs">
+          <button className={`tab-btn ${activeTab === 'login' ? 'active' : ''}`} onClick={() => setActiveTab('login')}>Sign In</button>
+          <button className={`tab-btn ${activeTab === 'register' ? 'active' : ''}`} onClick={() => setActiveTab('register')}>Investor Signup</button>
+          <button className={`tab-btn ${activeTab === 'apply' ? 'active' : ''}`} onClick={() => setActiveTab('apply')}>Apply as Farmer</button>
         </div>
 
         {activeTab === 'login' && (

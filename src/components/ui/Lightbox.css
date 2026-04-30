@@ -77,7 +77,7 @@
     height: 48px;
     border-radius: 6px;
     object-fit: cover;
-    border: 2px solid var(--border-color, #e5e7eb);
+    border: 2px solid var(--border);
     transition: border-color 0.2s;
 }
 

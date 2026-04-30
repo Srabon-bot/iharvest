@@ -7,6 +7,7 @@ import { getUsersByRole } from '../../services/userService';
 import { ROLES } from '../../utils/constants';
 import { Users } from 'lucide-react';
 
+const FarmersPage = () => {
     const [farmers, setFarmers] = useState([]);
 
     useEffect(() => {
@@ -14,7 +15,9 @@ import { Users } from 'lucide-react';
             try {
                 const data = await getUsersByRole(ROLES.FARMER);
                 if (data && data.length) setFarmers(data);
-            } catch { /* keep seed */ }
+            } catch (error) {
+                console.error('Failed to load farmers:', error);
+            }
         })();
     }, []);
 

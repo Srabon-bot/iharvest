@@ -12,6 +12,8 @@ import {
   sendPasswordResetEmail,
   onAuthStateChanged,
   updateProfile,
+  updatePassword,
+  getAuth
 } from 'firebase/auth';
 import { initializeApp, deleteApp } from 'firebase/app';
 import { auth } from './config.js';
@@ -116,4 +118,19 @@ export function onAuthChange(callback) {
  */
 export function getCurrentUser() {
   return auth.currentUser;
+}
+
+/**
+ * Update the current user's password.
+ * @param {string} newPassword
+ * @returns {Promise<void>}
+ */
+export async function firebaseUpdatePassword(newPassword) {
+  try {
+    if (!auth.currentUser) throw new Error("No user is currently signed in.");
+    return await updatePassword(auth.currentUser, newPassword);
+  } catch (error) {
+    console.error('[firebaseUpdatePassword]', error);
+    throw error;
+  }
 }

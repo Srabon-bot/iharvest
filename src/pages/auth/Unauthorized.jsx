@@ -13,7 +13,7 @@ const Unauthorized = () => {
       alignItems: 'center',
       justifyContent: 'center',
       minHeight: '100vh',
-      backgroundColor: 'var(--background)',
+      backgroundColor: 'var(--bg-primary)',
       padding: 'var(--spacing-md)'
     }}>
       <Card style={{
@@ -29,7 +29,7 @@ const Unauthorized = () => {
           height: '80px',
           borderRadius: '50%',
           backgroundColor: 'rgba(239, 68, 68, 0.1)',
-          color: 'var(--error-color)',
+          color: 'var(--danger)',
           marginBottom: 'var(--spacing-lg)'
         }}>
           <ShieldAlert size={40} />

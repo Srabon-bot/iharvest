@@ -15,13 +15,14 @@
   display: flex;
   align-items: flex-start;
   background-color: var(--bg-secondary);
-  border-radius: var(--radius-md);
-  box-shadow: var(--card-shadow);
-  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  padding: 0.875rem 1rem;
   border: 1px solid var(--border);
   border-left: 4px solid var(--border);
   pointer-events: auto;
-  animation: slideInRight var(--transition-normal) cubic-bezier(0.16, 1, 0.3, 1);
+  animation: toastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: var(--glass-blur);
 }
 
 .toast-success { border-left-color: var(--success); }
@@ -31,7 +32,7 @@
 
 .toast-icon-wrapper {
   margin-right: var(--spacing-3);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .toast-icon-success { color: var(--success); }
@@ -44,44 +45,46 @@
 }
 
 .toast-title {
-  margin: 0 0 var(--spacing-1) 0;
+  margin: 0 0 0.125rem 0;
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 .toast-message {
   margin: 0;
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
+  line-height: 1.4;
 }
 
 .toast-close {
   background: transparent;
   border: none;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   cursor: pointer;
-  padding: var(--spacing-1);
+  padding: 0.25rem;
   margin-left: var(--spacing-2);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .toast-close:hover {
-  background-color: var(--bg-primary);
+  background-color: var(--bg-tertiary);
   color: var(--text-primary);
 }
 
-@keyframes slideInRight {
+@keyframes toastSlideIn {
   from {
     opacity: 0;
-    transform: translateX(100%);
+    transform: translateX(100%) scale(0.9);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateX(0) scale(1);
   }
 }

@@ -9,11 +9,52 @@
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  min-width: 0; /* Important for preventing text overflow issues */
+  min-width: 0;
 }
 
 .dashboard-content {
-  padding: var(--spacing-6);
+  padding: var(--spacing-8) var(--spacing-6);
   flex-grow: 1;
   overflow-y: auto;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* ══════════════════════════════════════════════════════
+   MOBILE RESPONSIVE
+   ══════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .dashboard-content {
+    padding: var(--spacing-4) var(--spacing-3);
+  }
+
+  /* Dashboard page headers */
+  .dashboard-content h1 {
+    font-size: 1.4rem !important;
+  }
+
+  .dashboard-content p {
+    font-size: 0.85rem;
+  }
+
+  /* Make all inline grids stack on mobile */
+  .dashboard-content > div[style*="grid"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Stat card grids — 2 columns on tablet, 1 on phone */
+  .dashboard-content > div[style*="minmax(240px"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-content {
+    padding: var(--spacing-3) var(--spacing-2);
+  }
+
+  /* Single column stat cards on very small screens */
+  .dashboard-content > div[style*="minmax(240px"],
+  .dashboard-content > div[style*="minmax(180px"] {
+    grid-template-columns: 1fr !important;
+  }
 }

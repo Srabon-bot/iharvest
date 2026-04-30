@@ -14,6 +14,7 @@ import {
   firebaseLogin,
   firebaseLogout,
   firebaseResetPassword,
+  firebaseUpdatePassword,
   onAuthChange as firebaseOnAuthChange,
   firebaseAdminRegister,
 } from '../firebase/auth.js';
@@ -261,6 +262,23 @@ export async function initializeAdminProfile(uid, email, name) {
     return profileData;
   } catch (error) {
     console.error('[authService.initializeAdminProfile]', error);
+    throw error;
+  }
+}
+
+/**
+ * Update the current user's password.
+ */
+export async function updateUserPassword(newPassword) {
+  if (USE_MOCK_AUTH) {
+    await new Promise(r => setTimeout(r, 500));
+    return;
+  }
+  
+  try {
+    await firebaseUpdatePassword(newPassword);
+  } catch (error) {
+    console.error('[authService.updateUserPassword]', error);
     throw error;
   }
 }

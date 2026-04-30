@@ -36,6 +36,17 @@ export {
 };
 
 /**
+ * Wraps a promise in a timeout to prevent infinite hanging 
+ * if Firebase is offline or configured incorrectly.
+ */
+const withTimeout = (promise, ms = 10000) => {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Firebase operation timed out. Please check your connection or database rules.')), ms))
+  ]);
+};
+
+/**
  * Get a single document by collection name and document ID.
  * @param {string} collectionName
  * @param {string} docId
@@ -44,7 +55,7 @@ export {
 export async function getDocument(collectionName, docId) {
   try {
     const docRef = doc(db, collectionName, docId);
-    const snapshot = await getDoc(docRef);
+    const snapshot = await withTimeout(getDoc(docRef));
     if (!snapshot.exists()) return null;
     return { id: snapshot.id, ...snapshot.data() };
   } catch (error) {
@@ -63,7 +74,7 @@ export async function getDocuments(collectionName, ...constraints) {
   try {
     const ref = collection(db, collectionName);
     const q = constraints.length > 0 ? query(ref, ...constraints) : ref;
-    const snapshot = await getDocs(q);
+    const snapshot = await withTimeout(getDocs(q));
     return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
   } catch (error) {
     console.error(`[getDocuments] ${collectionName}`, error);
@@ -81,10 +92,10 @@ export async function getDocuments(collectionName, ...constraints) {
 export async function addDocument(collectionName, data) {
   try {
     const ref = collection(db, collectionName);
-    const docRef = await addDoc(ref, {
+    const docRef = await withTimeout(addDoc(ref, {
       ...data,
       createdAt: serverTimestamp(),
-    });
+    }));
     return docRef.id;
   } catch (error) {
     console.error(`[addDocument] ${collectionName}`, error);
@@ -104,11 +115,11 @@ export async function addDocument(collectionName, data) {
 export async function setDocument(collectionName, docId, data, merge = false) {
   try {
     const docRef = doc(db, collectionName, docId);
-    await setDoc(
+    await withTimeout(setDoc(
       docRef,
       { ...data, createdAt: serverTimestamp() },
       { merge }
-    );
+    ));
   } catch (error) {
     console.error(`[setDocument] ${collectionName}/${docId}`, error);
     throw error;
@@ -125,7 +136,7 @@ export async function setDocument(collectionName, docId, data, merge = false) {
 export async function updateDocument(collectionName, docId, data) {
   try {
     const docRef = doc(db, collectionName, docId);
-    await updateDoc(docRef, { ...data, updatedAt: serverTimestamp() });
+    await withTimeout(updateDoc(docRef, { ...data, updatedAt: serverTimestamp() }));
   } catch (error) {
     console.error(`[updateDocument] ${collectionName}/${docId}`, error);
     throw error;
@@ -141,7 +152,7 @@ export async function updateDocument(collectionName, docId, data) {
 export async function removeDocument(collectionName, docId) {
   try {
     const docRef = doc(db, collectionName, docId);
-    await deleteDoc(docRef);
+    await withTimeout(deleteDoc(docRef));
   } catch (error) {
     console.error(`[removeDocument] ${collectionName}/${docId}`, error);
     throw error;

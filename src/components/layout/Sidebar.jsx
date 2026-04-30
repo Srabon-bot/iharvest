@@ -41,17 +41,24 @@ const ROLE_NAV_ITEMS = {
   ],
 };
 
-const Sidebar = ({ isCollapsed, toggleSidebar, role = ROLES.ADMIN }) => {
+const Sidebar = ({ isCollapsed, toggleSidebar, role = ROLES.ADMIN, isMobileOpen, onMobileClose }) => {
   const navItems = ROLE_NAV_ITEMS[role] || [
     { name: 'Dashboard', path: '/', icon: LayoutDashboard }
   ];
 
+  // Build className
+  const sidebarClass = [
+    'sidebar',
+    isCollapsed ? 'collapsed' : '',
+    isMobileOpen ? 'mobile-open' : '',
+  ].filter(Boolean).join(' ');
+
   return (
-    <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+    <aside className={sidebarClass}>
       <div className="sidebar-header">
         <div className="sidebar-logo">
           <div className="logo-icon">iH</div>
-          {!isCollapsed && <span className="logo-text">iHarvest</span>}
+          {(!isCollapsed || isMobileOpen) && <span className="logo-text">iHarvest</span>}
         </div>
       </div>
       
@@ -61,16 +68,17 @@ const Sidebar = ({ isCollapsed, toggleSidebar, role = ROLES.ADMIN }) => {
             key={item.name} 
             to={item.path} 
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-            title={isCollapsed ? item.name : ''}
+            title={isCollapsed && !isMobileOpen ? item.name : ''}
+            onClick={onMobileClose}
           >
             <item.icon className="nav-icon" size={20} />
-            {!isCollapsed && <span className="nav-text">{item.name}</span>}
+            {(!isCollapsed || isMobileOpen) && <span className="nav-text">{item.name}</span>}
           </NavLink>
         ))}
       </nav>
       
       <div className="sidebar-footer">
-        {!isCollapsed && (
+        {(!isCollapsed || isMobileOpen) && (
           <div className="user-role-badge">
             Role: {role.charAt(0).toUpperCase() + role.slice(1)}
           </div>

@@ -25,7 +25,9 @@ const AdminDashboard = () => {
           investments: (investments || []).reduce((s, i) => s + (Number(i.amount) || 0), 0),
         });
         setRecentUsers((users || []).slice(0, 5));
-      } catch { /* use seed */ }
+      } catch (error) {
+        console.error('Failed to load admin stats:', error);
+      }
     })();
   }, []);
 
