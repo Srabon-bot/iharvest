@@ -67,7 +67,7 @@ function App() {
     <ToastProvider>
       <Routes>
         {/* Public Routes */}
-        <Route path="/login" element={user ? <Navigate to={getRootRedirect()} replace /> : <Login />} />
+        <Route path="/login" element={user && role ? <Navigate to={getRootRedirect()} replace /> : <Login />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="/init-admin" element={<AdminSetup />} />
         {/* Design system demo — dev only */}

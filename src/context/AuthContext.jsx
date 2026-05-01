@@ -16,6 +16,7 @@ import { onAuthChange, getUserProfile } from '../services/authService.js';
  * @property {object|null} userProfile - Firestore user profile document
  * @property {boolean} loading - True while auth state is being resolved
  * @property {string|null} role - Current user's role (shortcut for userProfile.role)
+ * @property {Function} refreshProfile - Refetches the user profile from Firestore
  */
 
 /** @type {import('react').Context<AuthContextValue>} */
@@ -24,6 +25,7 @@ export const AuthContext = createContext({
   userProfile: null,
   loading: true,
   role: null,
+  refreshProfile: async () => {},
 });
 
 /**
@@ -44,9 +46,9 @@ export function AuthProvider({ children }) {
     const unsubscribe = onAuthChange(async (firebaseUser) => {
       try {
         if (firebaseUser) {
-          setUser(firebaseUser);
           const profile = await getUserProfile(firebaseUser.uid);
           console.log('[AuthProvider] User authenticated:', firebaseUser.uid, 'Profile:', profile);
+          setUser(firebaseUser);
           setUserProfile(profile);
         } else {
           setUser(null);
@@ -67,11 +69,19 @@ export function AuthProvider({ children }) {
 
   const role = userProfile?.role || null;
 
+  const refreshProfile = async () => {
+    if (user) {
+      const profile = await getUserProfile(user.uid);
+      setUserProfile(profile);
+    }
+  };
+
   const value = {
     user,
     userProfile,
     loading,
     role,
+    refreshProfile,
   };
 
   return (

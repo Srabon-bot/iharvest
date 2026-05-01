@@ -7,6 +7,7 @@ import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import { useToast } from '../../components/ui/Toast';
+import { useAuth } from '../../hooks/useAuth';
 import { Mail, Lock, LogIn, UserPlus, Tractor, User, MapPin, Phone } from 'lucide-react';
 import './Login.css';
 
@@ -24,6 +25,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { addToast } = useToast();
+  const { refreshProfile } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -56,6 +58,7 @@ const Login = () => {
     try {
       // Default all public signups to INVESTOR
       const profile = await registerUser(email, password, name, ROLES.INVESTOR);
+      if (refreshProfile) await refreshProfile();
       addToast({ message: `Account created successfully! Welcome, ${profile.name}`, type: 'success' });
       navigate(ROLE_DASHBOARD[ROLES.INVESTOR], { replace: true });
     } catch (error) {

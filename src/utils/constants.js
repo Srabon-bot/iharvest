@@ -14,6 +14,7 @@ export const COLLECTIONS = Object.freeze({
   SURVEYS: 'surveys',
   VET_REQUESTS: 'vet_requests',
   TRANSACTIONS: 'transactions',
+  NOTIFICATIONS: 'notifications',
 });
 
 // ─── User Roles ─────────────────────────────────────────────────────────────
