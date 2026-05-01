@@ -89,7 +89,7 @@ const DesignSystemDemo = () => {
         <section style={{ marginBottom: 'var(--spacing-8)' }}>
           <h2 style={{ borderBottom: '1px solid var(--border)', paddingBottom: 'var(--spacing-2)', marginBottom: 'var(--spacing-4)' }}>Cards & Stats</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 'var(--spacing-4)', marginBottom: 'var(--spacing-4)' }}>
-            <StatCard title="Total Revenue" value="$45,231" icon={TrendingUp} trend="up" trendValue="12%" />
+            <StatCard title="Total Revenue" value="৳45,231" icon={TrendingUp} trend="up" trendValue="12%" />
             <StatCard title="Active Users" value="1,204" icon={User} trend="up" trendValue="5%" />
             <StatCard title="Pending Orders" value="43" trend="down" trendValue="2%" />
           </div>

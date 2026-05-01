@@ -7,6 +7,7 @@ import Modal from '../../components/ui/Modal';
 import Input from '../../components/ui/Input';
 import StatusBadge from '../../components/ui/StatusBadge';
 import { getAllPackages, createPackage, updatePackage } from '../../services/packageService';
+import { formatBDT } from '../../utils/formatters';
 import { PieChart, Plus, PackageOpen } from 'lucide-react';
 
 const EMPTY_FORM = { 
@@ -73,7 +74,7 @@ const InvestmentsPage = () => {
     const columns = [
         { header: 'Name', accessor: 'name' },
         { header: 'Type', accessor: 'type' },
-        { header: 'Price', accessor: 'price', render: (v) => `$${Number(v).toLocaleString()}` },
+        { header: 'Price', accessor: 'price', render: (v) => formatBDT(v) },
         { header: 'Livestock', accessor: 'livestockCount' },
         { header: 'Duration', accessor: 'durationMonths', render: (v) => `${v} mo` },
         { header: 'Investor Split', accessor: 'investorSplit', render: (v) => `${v}%` },
