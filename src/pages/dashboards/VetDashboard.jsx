@@ -38,6 +38,7 @@ const VetDashboard = () => {
 
   const pendingCount = requests.filter(r => r.status === 'pending').length;
   const completedCount = requests.filter(r => r.status === 'completed').length;
+  const inProgressCount = requests.filter(r => r.status === 'in_progress').length;
 
   const columns = [
     { header: 'Request ID', accessor: 'id' },
@@ -58,10 +59,10 @@ const VetDashboard = () => {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--spacing-lg)', marginBottom: 'var(--spacing-xl)' }}>
-        <Card variant="stat" title="Pending Requests" value={String(pendingCount)} icon={ClipboardList} trend={{ value: pendingCount, isPositive: false }} />
-        <Card variant="stat" title="Scheduled Visits" value="5" icon={Calendar} />
-        <Card variant="stat" title="Vaccinations Due" value="8" icon={Syringe} trend={{ value: -3, isPositive: true }} />
-        <Card variant="stat" title="Cases Resolved" value={String(completedCount)} icon={Cross} trend={{ value: completedCount, isPositive: true }} />
+        <Card variant="stat" title="Pending Requests" value={String(pendingCount)} icon={ClipboardList} />
+        <Card variant="stat" title="Scheduled Visits" value={String(inProgressCount)} icon={Calendar} />
+        <Card variant="stat" title="Vaccinations Due" value="0" icon={Syringe} />
+        <Card variant="stat" title="Cases Resolved" value={String(completedCount)} icon={Cross} />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 'var(--spacing-lg)' }}>

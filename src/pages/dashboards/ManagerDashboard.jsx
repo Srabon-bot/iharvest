@@ -44,9 +44,9 @@ const ManagerDashboard = () => {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--spacing-lg)', marginBottom: 'var(--spacing-xl)' }}>
         <Card variant="stat" title="Total Clusters" value={String(clusters.length)} icon={MapPin} />
-        <Card variant="stat" title="Total Capacity" value={totalCapacity > 1000 ? `${(totalCapacity/1000).toFixed(1)}K` : String(totalCapacity)} icon={Layers} trend={{ value: totalCapacity, isPositive: true }} />
-        <Card variant="stat" title="Pending Deliveries" value="6" icon={Truck} />
-        <Card variant="stat" title="Tasks Completed" value="89%" icon={CheckSquare} trend={{ value: 2, isPositive: true }} />
+        <Card variant="stat" title="Total Capacity" value={totalCapacity > 1000 ? `${(totalCapacity/1000).toFixed(1)}K` : String(totalCapacity)} icon={Layers} />
+        <Card variant="stat" title="Pending Deliveries" value="0" icon={Truck} />
+        <Card variant="stat" title="Tasks Completed" value="0%" icon={CheckSquare} />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 'var(--spacing-lg)' }}>

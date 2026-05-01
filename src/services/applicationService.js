@@ -21,6 +21,8 @@ const COLLECTIONS = {
 
 export const APPLICATION_STATUS = Object.freeze({
   PENDING: 'pending',
+  DETAILS_REQUESTED: 'details_requested',
+  VISIT_SCHEDULED: 'visit_scheduled',
   SURVEYED: 'surveyed',
   APPROVED: 'approved',
   REJECTED: 'rejected',
@@ -58,6 +60,26 @@ export async function getApplicationsByStatus(status) {
     );
   } catch (error) {
     console.error('[applicationService.getApplicationsByStatus]', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch all applications relevant to the FSO pre-survey phase
+ */
+export async function getApplicationsForFso() {
+  try {
+    return await getDocuments(
+      COLLECTIONS.APPLICATIONS,
+      where('status', 'in', [
+        APPLICATION_STATUS.PENDING, 
+        APPLICATION_STATUS.DETAILS_REQUESTED, 
+        APPLICATION_STATUS.VISIT_SCHEDULED
+      ]),
+      orderBy('createdAt', 'desc')
+    );
+  } catch (error) {
+    console.error('[applicationService.getApplicationsForFso]', error);
     throw error;
   }
 }

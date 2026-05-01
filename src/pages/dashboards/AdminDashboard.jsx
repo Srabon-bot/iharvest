@@ -48,9 +48,9 @@ const AdminDashboard = () => {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--spacing-lg)', marginBottom: 'var(--spacing-xl)' }}>
-        <Card variant="stat" title="Total Users" value={stats.users.toLocaleString()} icon={Users} trend={{ value: 12, isPositive: true }} />
-        <Card variant="stat" title="Active Livestock Batches" value={stats.livestock.toLocaleString()} icon={Tractor} trend={{ value: 5, isPositive: true }} />
-        <Card variant="stat" title="Total Investments" value={formatBDT(stats.investments)} icon={DollarSign} trend={{ value: 18, isPositive: true }} />
+        <Card variant="stat" title="Total Users" value={stats.users.toLocaleString()} icon={Users} />
+        <Card variant="stat" title="Active Livestock Batches" value={stats.livestock.toLocaleString()} icon={Tractor} />
+        <Card variant="stat" title="Total Investments" value={formatBDT(stats.investments)} icon={DollarSign} />
         <Card variant="stat" title="System Health" value="99.9%" icon={Activity} />
       </div>
 

@@ -8,7 +8,8 @@ import Modal from '../../components/ui/Modal';
 import Input from '../../components/ui/Input';
 import { Map, ClipboardCheck, Users, AlertCircle, FileText } from 'lucide-react';
 import { getSurveysByFso } from '../../services/surveyService';
-import { getApplicationsByStatus, updateApplication, APPLICATION_STATUS } from '../../services/applicationService';
+import { getApplicationsForFso, updateApplication, APPLICATION_STATUS } from '../../services/applicationService';
+import { getAllClusters } from '../../services/clusterService';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../components/ui/Toast';
 
@@ -16,6 +17,7 @@ const FsoDashboard = () => {
   const { user } = useAuth();
   const [surveys, setSurveys] = useState([]);
   const [applications, setApplications] = useState([]);
+  const [activeClusters, setActiveClusters] = useState(0);
   
   // Survey Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,12 +30,14 @@ const FsoDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [surveyData, appData] = await Promise.all([
+        const [surveyData, appData, clustersData] = await Promise.all([
           getSurveysByFso(user?.uid),
-          getApplicationsByStatus(APPLICATION_STATUS.PENDING)
+          getApplicationsForFso(),
+          getAllClusters()
         ]);
         if (surveyData && surveyData.length > 0) setSurveys(surveyData);
         if (appData && appData.length > 0) setApplications(appData);
+        if (clustersData) setActiveClusters(clustersData.length);
       } catch (error) {
         console.error('Failed to fetch data:', error);
       }
@@ -74,6 +78,26 @@ const FsoDashboard = () => {
     setIsModalOpen(true);
   };
 
+  const handleRequestDetails = async (app) => {
+    try {
+      await updateApplication(app.id, { status: APPLICATION_STATUS.DETAILS_REQUESTED });
+      addToast({ message: 'Requested details successfully (Simulated Email Sent)', type: 'success' });
+      setApplications(apps => apps.map(a => a.id === app.id ? { ...a, status: APPLICATION_STATUS.DETAILS_REQUESTED } : a));
+    } catch (error) {
+      addToast({ message: 'Failed to request details', type: 'error' });
+    }
+  };
+
+  const handleScheduleVisit = async (app) => {
+    try {
+      await updateApplication(app.id, { status: APPLICATION_STATUS.VISIT_SCHEDULED });
+      addToast({ message: 'Visit scheduled successfully (Simulated Calendar Event)', type: 'success' });
+      setApplications(apps => apps.map(a => a.id === app.id ? { ...a, status: APPLICATION_STATUS.VISIT_SCHEDULED } : a));
+    } catch (error) {
+      addToast({ message: 'Failed to schedule visit', type: 'error' });
+    }
+  };
+
   const pendingCount = surveys.filter(s => s.healthStatus === 'sick' || s.healthStatus === 'critical').length;
 
   const appColumns = [
@@ -84,11 +108,27 @@ const FsoDashboard = () => {
     { header: 'Date', accessor: 'createdAt', render: (v) => v ? new Date(v).toLocaleDateString() : '—' },
     {
       header: 'Actions', accessor: 'id',
-      render: (_, row) => (
-        <Button size="sm" variant="primary" onClick={() => openSurveyModal(row)}>
-          Submit Survey
-        </Button>
-      ),
+      render: (_, row) => {
+        if (row.status === APPLICATION_STATUS.PENDING) {
+          return (
+            <Button size="sm" variant="secondary" onClick={() => handleRequestDetails(row)}>
+              Request Details
+            </Button>
+          );
+        }
+        if (row.status === APPLICATION_STATUS.DETAILS_REQUESTED) {
+          return (
+            <Button size="sm" variant="secondary" onClick={() => handleScheduleVisit(row)}>
+              Schedule Visit
+            </Button>
+          );
+        }
+        return (
+          <Button size="sm" variant="primary" onClick={() => openSurveyModal(row)}>
+            Submit Survey
+          </Button>
+        );
+      },
     },
   ];
 
@@ -111,7 +151,7 @@ const FsoDashboard = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--spacing-lg)', marginBottom: 'var(--spacing-xl)' }}>
         <Card variant="stat" title="Pending Applications" value={String(applications.length)} icon={FileText} trend={{ value: applications.length, isPositive: true }} />
         <Card variant="stat" title="Total Surveys" value={String(surveys.length)} icon={ClipboardCheck} />
-        <Card variant="stat" title="Active Clusters" value="3" icon={Map} />
+        <Card variant="stat" title="Active Clusters" value={String(activeClusters)} icon={Map} />
         <Card variant="stat" title="Alerts" value={String(pendingCount)} icon={AlertCircle} trend={{ value: pendingCount, isPositive: false }} />
       </div>
 
