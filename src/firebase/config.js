@@ -9,7 +9,7 @@
 
 import { initializeApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator } from 'firebase/firestore';
 import { getStorage, connectStorageEmulator } from 'firebase/storage';
 import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
 
@@ -28,8 +28,10 @@ const app = initializeApp(firebaseConfig);
 /** Firebase Authentication instance */
 export const auth = getAuth(app);
 
-/** Cloud Firestore instance */
-export const db = getFirestore(app);
+/** Cloud Firestore instance with Offline Persistence enabled for instant loading */
+export const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+});
 
 /** Firebase Storage instance */
 export const storage = getStorage(app);
