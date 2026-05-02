@@ -72,11 +72,14 @@ export async function getLivestockById(livestockId) {
  */
 export async function getLivestockByFso(fsoId) {
   try {
-    return await getDocuments(
-      COLLECTIONS.LIVESTOCK,
-      where('fsoId', '==', fsoId),
-      orderBy('createdAt', 'desc')
-    );
+    const livestock = await getDocuments(COLLECTIONS.LIVESTOCK);
+    return livestock
+      .filter(l => l.fsoId === fsoId)
+      .sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
   } catch (error) {
     console.error('[livestockService.getLivestockByFso]', error);
     throw error;
@@ -93,11 +96,14 @@ export async function getLivestockByFso(fsoId) {
  */
 export async function getLivestockByFarmer(farmerId) {
   try {
-    return await getDocuments(
-      COLLECTIONS.LIVESTOCK,
-      where('farmerId', '==', farmerId),
-      orderBy('createdAt', 'desc')
-    );
+    const livestock = await getDocuments(COLLECTIONS.LIVESTOCK);
+    return livestock
+      .filter(l => l.farmerId === farmerId)
+      .sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
   } catch (error) {
     console.error('[livestockService.getLivestockByFarmer]', error);
     throw error;
@@ -114,11 +120,14 @@ export async function getLivestockByFarmer(farmerId) {
  */
 export async function getLivestockByInvestor(investorId) {
   try {
-    return await getDocuments(
-      COLLECTIONS.LIVESTOCK,
-      where('investorId', '==', investorId),
-      orderBy('createdAt', 'desc')
-    );
+    const livestock = await getDocuments(COLLECTIONS.LIVESTOCK);
+    return livestock
+      .filter(l => l.investorId === investorId)
+      .sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
   } catch (error) {
     console.error('[livestockService.getLivestockByInvestor]', error);
     throw error;
@@ -135,11 +144,14 @@ export async function getLivestockByInvestor(investorId) {
  */
 export async function getLivestockByCluster(clusterId) {
   try {
-    return await getDocuments(
-      COLLECTIONS.LIVESTOCK,
-      where('clusterId', '==', clusterId),
-      orderBy('createdAt', 'desc')
-    );
+    const livestock = await getDocuments(COLLECTIONS.LIVESTOCK);
+    return livestock
+      .filter(l => l.clusterId === clusterId)
+      .sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
   } catch (error) {
     console.error('[livestockService.getLivestockByCluster]', error);
     throw error;
@@ -155,7 +167,12 @@ export async function getLivestockByCluster(clusterId) {
  */
 export async function getAllLivestock() {
   try {
-    return await getDocuments(COLLECTIONS.LIVESTOCK, orderBy('createdAt', 'desc'));
+    const livestock = await getDocuments(COLLECTIONS.LIVESTOCK);
+    return livestock.sort((a, b) => {
+      const ta = a.createdAt?.seconds || 0;
+      const tb = b.createdAt?.seconds || 0;
+      return tb - ta;
+    });
   } catch (error) {
     console.error('[livestockService.getAllLivestock]', error);
     throw error;

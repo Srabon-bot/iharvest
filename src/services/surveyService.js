@@ -52,11 +52,14 @@ export async function submitSurvey(data) {
  */
 export async function getSurveysByFso(fsoId) {
   try {
-    return await getDocuments(
-      COLLECTIONS.SURVEYS,
-      where('fsoId', '==', fsoId),
-      orderBy('createdAt', 'desc')
-    );
+    const surveys = await getDocuments(COLLECTIONS.SURVEYS);
+    return surveys
+      .filter(s => s.fsoId === fsoId)
+      .sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
   } catch (error) {
     console.error('[surveyService.getSurveysByFso]', error);
     throw error;
@@ -73,11 +76,14 @@ export async function getSurveysByFso(fsoId) {
  */
 export async function getSurveysByLivestock(livestockId) {
   try {
-    return await getDocuments(
-      COLLECTIONS.SURVEYS,
-      where('livestockId', '==', livestockId),
-      orderBy('createdAt', 'desc')
-    );
+    const surveys = await getDocuments(COLLECTIONS.SURVEYS);
+    return surveys
+      .filter(s => s.livestockId === livestockId)
+      .sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
   } catch (error) {
     console.error('[surveyService.getSurveysByLivestock]', error);
     throw error;
@@ -94,11 +100,13 @@ export async function getSurveysByLivestock(livestockId) {
  */
 export async function getRecentSurveys(count = 20) {
   try {
-    return await getDocuments(
-      COLLECTIONS.SURVEYS,
-      orderBy('createdAt', 'desc'),
-      limit(count)
-    );
+    const surveys = await getDocuments(COLLECTIONS.SURVEYS);
+    const sorted = surveys.sort((a, b) => {
+      const ta = a.createdAt?.seconds || 0;
+      const tb = b.createdAt?.seconds || 0;
+      return tb - ta;
+    });
+    return sorted.slice(0, count);
   } catch (error) {
     console.error('[surveyService.getRecentSurveys]', error);
     throw error;
@@ -115,11 +123,14 @@ export async function getRecentSurveys(count = 20) {
  */
 export async function getSurveysByFarmer(farmerId) {
   try {
-    return await getDocuments(
-      COLLECTIONS.SURVEYS,
-      where('farmerId', '==', farmerId),
-      orderBy('createdAt', 'desc')
-    );
+    const surveys = await getDocuments(COLLECTIONS.SURVEYS);
+    return surveys
+      .filter(s => s.farmerId === farmerId)
+      .sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
   } catch (error) {
     console.error('[surveyService.getSurveysByFarmer]', error);
     throw error;

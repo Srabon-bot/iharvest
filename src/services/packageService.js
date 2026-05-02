@@ -54,7 +54,12 @@ export async function createPackage(data) {
  */
 export async function getAllPackages() {
   try {
-    return await getDocuments(COLLECTIONS.PACKAGES, orderBy('createdAt', 'desc'));
+    const packages = await getDocuments(COLLECTIONS.PACKAGES);
+    return packages.sort((a, b) => {
+      const ta = a.createdAt?.seconds || 0;
+      const tb = b.createdAt?.seconds || 0;
+      return tb - ta;
+    });
   } catch (error) {
     console.error('[packageService.getAllPackages]', error);
     throw error;
@@ -70,11 +75,14 @@ export async function getAllPackages() {
  */
 export async function getActivePackages() {
   try {
-    return await getDocuments(
-      COLLECTIONS.PACKAGES,
-      where('isActive', '==', true),
-      orderBy('createdAt', 'desc')
-    );
+    const packages = await getDocuments(COLLECTIONS.PACKAGES);
+    return packages
+      .filter(p => p.isActive === true)
+      .sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
   } catch (error) {
     console.error('[packageService.getActivePackages]', error);
     throw error;

@@ -49,11 +49,14 @@ export async function createTransaction(data) {
  */
 export async function getTransactionsByUser(userId) {
   try {
-    return await getDocuments(
-      COLLECTIONS.TRANSACTIONS,
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
-    );
+    const transactions = await getDocuments(COLLECTIONS.TRANSACTIONS);
+    return transactions
+      .filter(t => t.userId === userId)
+      .sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
   } catch (error) {
     console.error('[transactionService.getTransactionsByUser]', error);
     throw error;
@@ -69,7 +72,12 @@ export async function getTransactionsByUser(userId) {
  */
 export async function getAllTransactions() {
   try {
-    return await getDocuments(COLLECTIONS.TRANSACTIONS, orderBy('createdAt', 'desc'));
+    const transactions = await getDocuments(COLLECTIONS.TRANSACTIONS);
+    return transactions.sort((a, b) => {
+      const ta = a.createdAt?.seconds || 0;
+      const tb = b.createdAt?.seconds || 0;
+      return tb - ta;
+    });
   } catch (error) {
     console.error('[transactionService.getAllTransactions]', error);
     throw error;

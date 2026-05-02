@@ -59,11 +59,14 @@ export async function createInvestment(data) {
  */
 export async function getInvestmentsByInvestor(investorId) {
   try {
-    return await getDocuments(
-      COLLECTIONS.INVESTMENTS,
-      where('investorId', '==', investorId),
-      orderBy('createdAt', 'desc')
-    );
+    const investments = await getDocuments(COLLECTIONS.INVESTMENTS);
+    return investments
+      .filter(i => i.investorId === investorId)
+      .sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
   } catch (error) {
     console.error('[investmentService.getInvestmentsByInvestor]', error);
     throw error;
@@ -79,7 +82,12 @@ export async function getInvestmentsByInvestor(investorId) {
  */
 export async function getAllInvestments() {
   try {
-    return await getDocuments(COLLECTIONS.INVESTMENTS, orderBy('createdAt', 'desc'));
+    const investments = await getDocuments(COLLECTIONS.INVESTMENTS);
+    return investments.sort((a, b) => {
+      const ta = a.createdAt?.seconds || 0;
+      const tb = b.createdAt?.seconds || 0;
+      return tb - ta;
+    });
   } catch (error) {
     console.error('[investmentService.getAllInvestments]', error);
     throw error;
@@ -210,11 +218,14 @@ export async function completeInvestmentCycle(investmentId, farmerId, grossReven
  */
 export async function getActiveInvestments() {
   try {
-    return await getDocuments(
-      COLLECTIONS.INVESTMENTS,
-      where('status', '==', INVESTMENT_STATUS.ACTIVE),
-      orderBy('createdAt', 'desc')
-    );
+    const investments = await getDocuments(COLLECTIONS.INVESTMENTS);
+    return investments
+      .filter(i => i.status === INVESTMENT_STATUS.ACTIVE)
+      .sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
   } catch (error) {
     console.error('[investmentService.getActiveInvestments]', error);
     throw error;

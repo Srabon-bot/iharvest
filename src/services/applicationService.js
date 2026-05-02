@@ -48,16 +48,19 @@ export async function submitApplication(data) {
 }
 
 /**
- * Fetch applications by status
+ * Fetch applications by status (client-side filtered for index independence)
  * @param {string} status 
  */
 export async function getApplicationsByStatus(status) {
   try {
-    return await getDocuments(
-      COLLECTIONS.APPLICATIONS,
-      where('status', '==', status),
-      orderBy('createdAt', 'desc')
-    );
+    const all = await getDocuments(COLLECTIONS.APPLICATIONS);
+    return all
+      .filter(a => a.status === status)
+      .sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
   } catch (error) {
     console.error('[applicationService.getApplicationsByStatus]', error);
     throw error;
@@ -65,19 +68,23 @@ export async function getApplicationsByStatus(status) {
 }
 
 /**
- * Fetch all applications relevant to the FSO pre-survey phase
+ * Fetch all applications relevant to the FSO pre-survey phase (client-side filtered)
  */
 export async function getApplicationsForFso() {
   try {
-    return await getDocuments(
-      COLLECTIONS.APPLICATIONS,
-      where('status', 'in', [
-        APPLICATION_STATUS.PENDING, 
-        APPLICATION_STATUS.DETAILS_REQUESTED, 
-        APPLICATION_STATUS.VISIT_SCHEDULED
-      ]),
-      orderBy('createdAt', 'desc')
-    );
+    const FSO_STATUSES = [
+      APPLICATION_STATUS.PENDING,
+      APPLICATION_STATUS.DETAILS_REQUESTED,
+      APPLICATION_STATUS.VISIT_SCHEDULED,
+    ];
+    const all = await getDocuments(COLLECTIONS.APPLICATIONS);
+    return all
+      .filter(a => FSO_STATUSES.includes(a.status))
+      .sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
   } catch (error) {
     console.error('[applicationService.getApplicationsForFso]', error);
     throw error;

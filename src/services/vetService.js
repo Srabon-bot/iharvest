@@ -51,11 +51,14 @@ export async function createVetRequest(data) {
  */
 export async function getVetRequests(vetId) {
   try {
-    return await getDocuments(
-      COLLECTIONS.VET_REQUESTS,
-      where('vetId', '==', vetId),
-      orderBy('createdAt', 'desc')
-    );
+    const requests = await getDocuments(COLLECTIONS.VET_REQUESTS);
+    return requests
+      .filter(r => r.vetId === vetId)
+      .sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
   } catch (error) {
     console.error('[vetService.getVetRequests]', error);
     throw error;
@@ -71,11 +74,14 @@ export async function getVetRequests(vetId) {
  */
 export async function getPendingRequests() {
   try {
-    return await getDocuments(
-      COLLECTIONS.VET_REQUESTS,
-      where('status', '==', VET_REQUEST_STATUS.PENDING),
-      orderBy('createdAt', 'desc')
-    );
+    const requests = await getDocuments(COLLECTIONS.VET_REQUESTS);
+    return requests
+      .filter(r => r.status === VET_REQUEST_STATUS.PENDING)
+      .sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
   } catch (error) {
     console.error('[vetService.getPendingRequests]', error);
     throw error;
@@ -135,10 +141,12 @@ export async function assignVetToRequest(requestId, vetId) {
  */
 export async function getAllVetRequests() {
   try {
-    return await getDocuments(
-      COLLECTIONS.VET_REQUESTS,
-      orderBy('createdAt', 'desc')
-    );
+    const requests = await getDocuments(COLLECTIONS.VET_REQUESTS);
+    return requests.sort((a, b) => {
+      const ta = a.createdAt?.seconds || 0;
+      const tb = b.createdAt?.seconds || 0;
+      return tb - ta;
+    });
   } catch (error) {
     console.error('[vetService.getAllVetRequests]', error);
     throw error;
