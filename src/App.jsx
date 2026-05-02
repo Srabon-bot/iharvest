@@ -6,6 +6,7 @@ import { ROLES, ROLE_DASHBOARD } from './utils/constants.js';
 import { PageLoader } from './components/ui/Loader.jsx';
 
 // Auth & Public
+import Home from './pages/public/Home.jsx';
 import Login from './pages/auth/Login.jsx';
 import Unauthorized from './pages/auth/Unauthorized.jsx';
 import DesignSystemDemo from './pages/DesignSystemDemo.jsx';
@@ -73,8 +74,8 @@ function App() {
         {/* Design system demo — dev only */}
         {import.meta.env.DEV && <Route path="/design" element={<DesignSystemDemo />} />}
 
-        {/* Root Redirect */}
-        <Route path="/" element={<Navigate to={getRootRedirect()} replace />} />
+        {/* Public Landing Page */}
+        <Route path="/" element={<Home />} />
 
         {/* ══ Admin ══ */}
         <Route element={<RoleRoute roles={[ROLES.ADMIN]} />}>
