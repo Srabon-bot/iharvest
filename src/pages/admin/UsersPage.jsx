@@ -99,8 +99,8 @@ const UsersPage = () => {
     
     setSaving(true);
     try {
-      // Generate temporary password
-      const tempPassword = Math.random().toString(36).slice(-8) + 'A1!';
+      // Set temporary password as requested
+      const tempPassword = '123456';
       // Use email if provided in app, otherwise generate a placeholder (ideally form requires email)
       const farmerEmail = app.email || `farmer${Date.now()}@iharvest.local`;
       
