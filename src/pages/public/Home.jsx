@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 import { ROLE_DASHBOARD } from '../../utils/constants.js';
 import Button from '../../components/ui/Button.jsx';
-import { Sprout, Users, ShieldCheck, LineChart, ArrowRight, Leaf } from 'lucide-react';
+import { Sprout, Users, ShieldCheck, LineChart, ArrowRight } from 'lucide-react';
 import './Home.css';
 
 const Home = () => {
@@ -27,7 +27,7 @@ const Home = () => {
     <div className="home-container">
       <nav className="home-navbar">
         <div className="home-logo">
-          <Leaf className="logo-icon" size={28} color="var(--primary-color)" />
+          <div className="home-logo-icon">iH</div>
           <span>iHarvest</span>
         </div>
         <div className="home-nav-links">
