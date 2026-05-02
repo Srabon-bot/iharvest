@@ -15,6 +15,7 @@ export const COLLECTIONS = Object.freeze({
   VET_REQUESTS: 'vet_requests',
   TRANSACTIONS: 'transactions',
   NOTIFICATIONS: 'notifications',
+  DELIVERIES: 'deliveries',
 });
 
 // ─── User Roles ─────────────────────────────────────────────────────────────
@@ -65,6 +66,13 @@ export const TRANSACTION_STATUS = Object.freeze({
   PENDING: 'pending',
   COMPLETED: 'completed',
   FAILED: 'failed',
+});
+
+// ─── Delivery Status ────────────────────────────────────────────────────────
+export const DELIVERY_STATUS = Object.freeze({
+  PENDING: 'pending',
+  IN_PROGRESS: 'in_progress',
+  COMPLETED: 'completed',
 });
 
 // ─── Health Status Options (for Surveys) ────────────────────────────────────
