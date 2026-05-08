@@ -1,0 +1,182 @@
+{
+  "info": {
+    "name": "iHarvest API Tests",
+    "_postman_id": "iharvest-api-tests-001",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "API-001: Firebase Auth - Sign In",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"admin@iharvest.com\",\"password\":\"123456\",\"returnSecureToken\":true}"
+        },
+        "url": {
+          "raw": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDKBp0eUFt1mb2-XqCXa5td7gZ1zCAsM-s",
+          "protocol": "https",
+          "host": ["identitytoolkit", "googleapis", "com"],
+          "path": ["v1", "accounts:signInWithPassword"],
+          "query": [{"key": "key", "value": "AIzaSyDKBp0eUFt1mb2-XqCXa5td7gZ1zCAsM-s"}]
+        }
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 2000ms', function () { pm.expect(pm.response.responseTime).to.be.below(2000); });",
+            "pm.test('Response is valid JSON', function () { pm.response.to.be.json; });",
+            "pm.test('Contains idToken', function () { var j = pm.response.json(); pm.expect(j).to.have.property('idToken'); });",
+            "pm.test('Contains localId', function () { var j = pm.response.json(); pm.expect(j).to.have.property('localId'); });",
+            "if (pm.response.code === 200) { pm.environment.set('authToken', pm.response.json().idToken); }"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "API-002: Get Farmers Collection",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "https://firestore.googleapis.com/v1/projects/iharvest-platform/databases/(default)/documents/farmers?pageSize=5",
+          "protocol": "https",
+          "host": ["firestore", "googleapis", "com"],
+          "path": ["v1", "projects", "iharvest-platform", "databases", "(default)", "documents", "farmers"],
+          "query": [{"key": "pageSize", "value": "5"}]
+        }
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 2000ms', function () { pm.expect(pm.response.responseTime).to.be.below(2000); });",
+            "pm.test('Response is valid JSON', function () { pm.response.to.be.json; });"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "API-003: Get Investments Collection",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "https://firestore.googleapis.com/v1/projects/iharvest-platform/databases/(default)/documents/investments?pageSize=5",
+          "protocol": "https",
+          "host": ["firestore", "googleapis", "com"],
+          "path": ["v1", "projects", "iharvest-platform", "databases", "(default)", "documents", "investments"],
+          "query": [{"key": "pageSize", "value": "5"}]
+        }
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 2000ms', function () { pm.expect(pm.response.responseTime).to.be.below(2000); });",
+            "pm.test('Response is valid JSON', function () { pm.response.to.be.json; });"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "API-004: Get Users Collection",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "https://firestore.googleapis.com/v1/projects/iharvest-platform/databases/(default)/documents/users?pageSize=5",
+          "protocol": "https",
+          "host": ["firestore", "googleapis", "com"],
+          "path": ["v1", "projects", "iharvest-platform", "databases", "(default)", "documents", "users"],
+          "query": [{"key": "pageSize", "value": "5"}]
+        }
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 2000ms', function () { pm.expect(pm.response.responseTime).to.be.below(2000); });",
+            "pm.test('Response is valid JSON', function () { pm.response.to.be.json; });"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "API-005: Get Packages Collection",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "https://firestore.googleapis.com/v1/projects/iharvest-platform/databases/(default)/documents/packages?pageSize=5",
+          "protocol": "https",
+          "host": ["firestore", "googleapis", "com"],
+          "path": ["v1", "projects", "iharvest-platform", "databases", "(default)", "documents", "packages"],
+          "query": [{"key": "pageSize", "value": "5"}]
+        }
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 2000ms', function () { pm.expect(pm.response.responseTime).to.be.below(2000); });",
+            "pm.test('Response is valid JSON', function () { pm.response.to.be.json; });"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "API-006: Invalid Endpoint Returns Error",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "https://firestore.googleapis.com/v1/projects/iharvest-platform/databases/(default)/documents/nonexistent_collection",
+          "protocol": "https",
+          "host": ["firestore", "googleapis", "com"],
+          "path": ["v1", "projects", "iharvest-platform", "databases", "(default)", "documents", "nonexistent_collection"]
+        }
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "pm.test('Empty or error response for nonexistent collection', function () { pm.expect(pm.response.code).to.be.oneOf([200, 404]); });",
+            "pm.test('Response time < 2000ms', function () { pm.expect(pm.response.responseTime).to.be.below(2000); });",
+            "pm.test('Response is valid JSON', function () { pm.response.to.be.json; });"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "API-007: Auth with Invalid Credentials",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"fake@invalid.com\",\"password\":\"wrongpassword\",\"returnSecureToken\":true}"
+        },
+        "url": {
+          "raw": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDKBp0eUFt1mb2-XqCXa5td7gZ1zCAsM-s",
+          "protocol": "https",
+          "host": ["identitytoolkit", "googleapis", "com"],
+          "path": ["v1", "accounts:signInWithPassword"],
+          "query": [{"key": "key", "value": "AIzaSyDKBp0eUFt1mb2-XqCXa5td7gZ1zCAsM-s"}]
+        }
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "pm.test('Returns 400 for invalid credentials', function () { pm.response.to.have.status(400); });",
+            "pm.test('Response time < 2000ms', function () { pm.expect(pm.response.responseTime).to.be.below(2000); });",
+            "pm.test('Contains error message', function () { var j = pm.response.json(); pm.expect(j).to.have.property('error'); });"
+          ]
+        }
+      }]
+    }
+  ]
+}

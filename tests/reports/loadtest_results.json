@@ -1,0 +1,126 @@
+{
+  "tool": "autocannon (JMeter equivalent — Node.js)",
+  "jmeterEquivalent": {
+    "threads": 50,
+    "rampUp": "immediate",
+    "duration": "15s per endpoint"
+  },
+  "target": "https://iharvest-six.vercel.app",
+  "date": "2026-05-06T18:42:28.609Z",
+  "results": [
+    {
+      "endpoint": "Homepage",
+      "url": "https://iharvest-six.vercel.app/",
+      "method": "GET",
+      "connections": 50,
+      "duration": "15s",
+      "latency": {
+        "average": 53.02,
+        "min": 37,
+        "max": 281,
+        "p50": 52,
+        "p90": 62,
+        "p99": 70,
+        "stddev": 12.46
+      },
+      "requests": {
+        "average": 933.8,
+        "min": 758,
+        "max": 968,
+        "total": 14007,
+        "sent": 14057
+      },
+      "throughput": {
+        "average": 338679.47,
+        "total": 5080331
+      },
+      "errors": 0,
+      "timeouts": 0,
+      "mismatches": 0,
+      "non2xx": 14007,
+      "statusCodes": {
+        "403": {
+          "count": 10807
+        },
+        "404": {
+          "count": 3200
+        }
+      }
+    },
+    {
+      "endpoint": "Login Page",
+      "url": "https://iharvest-six.vercel.app/login",
+      "method": "GET",
+      "connections": 50,
+      "duration": "15s",
+      "latency": {
+        "average": 51.89,
+        "min": 39,
+        "max": 313,
+        "p50": 51,
+        "p90": 61,
+        "p99": 68,
+        "stddev": 12.09
+      },
+      "requests": {
+        "average": 954.14,
+        "min": 815,
+        "max": 982,
+        "total": 14312,
+        "sent": 14362
+      },
+      "throughput": {
+        "average": 317738.67,
+        "total": 4765896
+      },
+      "errors": 0,
+      "timeouts": 0,
+      "mismatches": 0,
+      "non2xx": 14312,
+      "statusCodes": {
+        "403": {
+          "count": 14312
+        }
+      }
+    },
+    {
+      "endpoint": "Firebase Auth API",
+      "url": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDKBp0eUFt1mb2-XqCXa5td7gZ1zCAsM-s",
+      "method": "POST",
+      "connections": 50,
+      "duration": "15s",
+      "latency": {
+        "average": 357.99,
+        "min": 299,
+        "max": 3746,
+        "p50": 332,
+        "p90": 367,
+        "p99": 999,
+        "stddev": 185.87
+      },
+      "requests": {
+        "average": 138.54,
+        "min": 96,
+        "max": 149,
+        "total": 2078,
+        "sent": 2128
+      },
+      "throughput": {
+        "average": 110018.14,
+        "total": 1650288
+      },
+      "errors": 0,
+      "timeouts": 0,
+      "mismatches": 0,
+      "non2xx": 2029,
+      "statusCodes": {
+        "200": {
+          "count": 49
+        },
+        "400": {
+          "count": 2029
+        }
+      }
+    }
+  ]
+}

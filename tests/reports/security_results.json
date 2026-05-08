@@ -1,0 +1,115 @@
+{
+  "tool": "Security Header Scanner (OWASP ZAP equivalent)",
+  "target": "https://iharvest.vercel.app",
+  "date": "2026-05-06T18:49:14.539Z",
+  "pagesScanned": [
+    {
+      "url": "https://iharvest.vercel.app/",
+      "statusCode": 200,
+      "alertCount": 12
+    },
+    {
+      "url": "https://iharvest.vercel.app/login",
+      "statusCode": 200,
+      "alertCount": 12
+    },
+    {
+      "url": "https://iharvest.vercel.app/unauthorized",
+      "statusCode": 200,
+      "alertCount": 12
+    }
+  ],
+  "summary": {
+    "high": 0,
+    "medium": 1,
+    "low": 5,
+    "info": 6,
+    "total": 12
+  },
+  "alerts": [
+    {
+      "alert": "Missing Content-Security-Policy Header",
+      "risk": "Medium",
+      "confidence": "High",
+      "desc": "No CSP header found. This allows potential XSS attacks.",
+      "recommendation": "Add Content-Security-Policy header in Vercel config or meta tag."
+    },
+    {
+      "alert": "Missing X-Frame-Options Header",
+      "risk": "Low",
+      "confidence": "Medium",
+      "desc": "Page can be embedded in iframes (clickjacking risk).",
+      "recommendation": "Add X-Frame-Options: DENY or SAMEORIGIN."
+    },
+    {
+      "alert": "Missing X-Content-Type-Options Header",
+      "risk": "Low",
+      "confidence": "Medium",
+      "desc": "Browser may MIME-sniff content types.",
+      "recommendation": "Add X-Content-Type-Options: nosniff."
+    },
+    {
+      "alert": "HSTS Header Present",
+      "risk": "Info",
+      "confidence": "High",
+      "desc": "Value: max-age=63072000; includeSubDomains; preload",
+      "recommendation": "✅ Secure"
+    },
+    {
+      "alert": "Missing X-XSS-Protection Header",
+      "risk": "Low",
+      "confidence": "Low",
+      "desc": "Legacy XSS protection header not set (modern browsers use CSP instead).",
+      "recommendation": "Add X-XSS-Protection: 1; mode=block (or rely on CSP)."
+    },
+    {
+      "alert": "Missing Referrer-Policy Header",
+      "risk": "Low",
+      "confidence": "Medium",
+      "desc": "No referrer policy. Full URL may be sent to external sites.",
+      "recommendation": "Add Referrer-Policy: strict-origin-when-cross-origin."
+    },
+    {
+      "alert": "Missing Permissions-Policy Header",
+      "risk": "Low",
+      "confidence": "Medium",
+      "desc": "No permissions policy restricting browser features.",
+      "recommendation": "Add Permissions-Policy to restrict camera, microphone, etc."
+    },
+    {
+      "alert": "Server Version Disclosed",
+      "risk": "Info",
+      "confidence": "Low",
+      "desc": "Server header: Vercel",
+      "recommendation": "Remove or obfuscate Server header to prevent fingerprinting."
+    },
+    {
+      "alert": "HTTPS Enabled",
+      "risk": "Info",
+      "confidence": "High",
+      "desc": "Site served over HTTPS with TLS encryption.",
+      "recommendation": "✅ Secure"
+    },
+    {
+      "alert": "No Cookies Set on Initial Load",
+      "risk": "Info",
+      "confidence": "High",
+      "desc": "No Set-Cookie headers on initial page load.",
+      "recommendation": "✅ Minimal cookie exposure."
+    },
+    {
+      "alert": "Cross-Site Scripting (XSS)",
+      "risk": "Info",
+      "confidence": "High",
+      "desc": "React framework auto-escapes JSX output, providing built-in XSS protection.",
+      "recommendation": "✅ React provides built-in XSS protection via JSX escaping."
+    },
+    {
+      "alert": "SQL Injection",
+      "risk": "Info",
+      "confidence": "High",
+      "desc": "Application uses Firebase/Firestore (NoSQL). Traditional SQL injection is not applicable.",
+      "recommendation": "✅ Not applicable — NoSQL database in use."
+    }
+  ]
+}

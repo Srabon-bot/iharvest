@@ -21,6 +21,11 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.7.0",
+    "autocannon": "^8.0.0",
+    "chromedriver": "^148.0.2",
+    "newman": "^6.2.2",
+    "newman-reporter-htmlextra": "^1.23.1",
+    "selenium-webdriver": "^4.43.0",
     "vite": "^5.4.21"
   }
 }

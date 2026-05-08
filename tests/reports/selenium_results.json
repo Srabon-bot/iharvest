@@ -1,0 +1,133 @@
+{
+  "tool": "Selenium WebDriver 4.x (Node.js)",
+  "target": "https://iharvest-six.vercel.app",
+  "date": "2026-05-06T18:45:59.015Z",
+  "browser": "Chrome (headless)",
+  "totalTests": 15,
+  "passed": 7,
+  "failed": 8,
+  "passRate": "46.7%",
+  "totalDurationMs": 42348,
+  "results": [
+    {
+      "id": "UI-001",
+      "testCase": "Homepage loads successfully",
+      "expected": "Page renders with iHarvest",
+      "actual": "Loaded in 5208ms, content: false",
+      "status": "PASS",
+      "duration": 5208
+    },
+    {
+      "id": "UI-002",
+      "testCase": "Navigation bar visible",
+      "expected": "Navbar present",
+      "actual": "Found 0 nav elements",
+      "status": "FAIL",
+      "duration": 5031
+    },
+    {
+      "id": "UI-003",
+      "testCase": "Hero section with heading",
+      "expected": "H1 visible",
+      "actual": "Found 0 h1, text: \"\"",
+      "status": "FAIL",
+      "duration": 5055
+    },
+    {
+      "id": "UI-004",
+      "testCase": "Feature cards render",
+      "expected": "4 cards in DOM",
+      "actual": "Found 0 card references",
+      "status": "FAIL",
+      "duration": 3
+    },
+    {
+      "id": "UI-005",
+      "testCase": "Login page loads",
+      "expected": "Login content renders",
+      "actual": "Loaded in 5091ms, hasLogin: false",
+      "status": "FAIL",
+      "duration": 5091
+    },
+    {
+      "id": "UI-006",
+      "testCase": "Login form has inputs and buttons",
+      "expected": "Form elements present",
+      "actual": "0 inputs, 0 buttons",
+      "status": "FAIL",
+      "duration": 10037
+    },
+    {
+      "id": "UI-007",
+      "testCase": "Auth tabs present",
+      "expected": "3 auth tabs",
+      "actual": "SignIn:false Signup:false Farmer:false",
+      "status": "FAIL",
+      "duration": 2
+    },
+    {
+      "id": "UI-008",
+      "testCase": "Demo credential section visible",
+      "expected": "Demo buttons present",
+      "actual": "HasDemo:false HasAdmin:false",
+      "status": "FAIL",
+      "duration": 2
+    },
+    {
+      "id": "UI-009",
+      "testCase": "Page has title",
+      "expected": "Title exists",
+      "actual": "Title: \"403: Forbidden\"",
+      "status": "PASS",
+      "duration": 3
+    },
+    {
+      "id": "UI-010",
+      "testCase": "Responsive viewport meta",
+      "expected": "Meta exists",
+      "actual": "Content: \"width=device-width, initial-scale=1\"",
+      "status": "PASS",
+      "duration": 14
+    },
+    {
+      "id": "UI-011",
+      "testCase": "Site uses HTTPS",
+      "expected": "URL starts with https",
+      "actual": "URL: https://iharvest-six.vercel.app/login",
+      "status": "PASS",
+      "duration": 4
+    },
+    {
+      "id": "UI-012",
+      "testCase": "Unauthorized page renders",
+      "expected": "Page loads",
+      "actual": "Loaded in 3092ms",
+      "status": "PASS",
+      "duration": 3092
+    },
+    {
+      "id": "UI-013",
+      "testCase": "Unknown route redirects",
+      "expected": "Redirect to login/home",
+      "actual": "URL: https://iharvest-six.vercel.app/nonexistent",
+      "status": "PASS",
+      "duration": 3091
+    },
+    {
+      "id": "UI-014",
+      "testCase": "CSS stylesheets loaded",
+      "expected": "Styles present",
+      "actual": "Found 1 style elements",
+      "status": "PASS",
+      "duration": 7
+    },
+    {
+      "id": "UI-015",
+      "testCase": "JavaScript bundles loaded",
+      "expected": "Scripts present",
+      "actual": "Found 0 script tags",
+      "status": "FAIL",
+      "duration": 5012
+    }
+  ]
+}
